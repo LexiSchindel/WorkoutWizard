@@ -3,10 +3,10 @@ const env = require('dotenv').config();
 
 const pool = mysql.createPool({
     connectionLimit: 10,
-    host: env.parsed.CLEARDB_DATABASE_HOST,
-    user: env.parsed.CLEARDB_DATABASE_USER,
-    password: env.parsed.CLEARDB_DATABASE_PW,
-    database: env.parsed.CLEARDB_DATABASE_NAME,
+    host: process.env.CLEARDB_DATABASE_HOST || env.parsed.CLEARDB_DATABASE_HOST,
+    user: process.env.CLEARDB_DATABASE_USER || env.parsed.CLEARDB_DATABASE_USER,
+    password: process.env.CLEARDB_DATABASE_PW || env.parsed.CLEARDB_DATABASE_PW,
+    database: process.env.CLEARDB_DATABASE_NAME || env.parsed.CLEARDB_DATABASE_NAME,
     port: 3306
 });
 
