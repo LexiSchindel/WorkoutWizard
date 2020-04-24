@@ -1,6 +1,7 @@
 import React from 'react';
 import { Nav, Navbar, NavItem } from 'react-bootstrap';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
+import Home from "./Home";
 import Workouts from "./Workouts";
 import Exercises from "./Exercises";
 import Users from "./Users";
@@ -31,6 +32,7 @@ class NavBarMain extends React.Component {
                 </div>
                 <div>
                     <Switch>
+                        <Route exact path='/' component={Home} />
                         <Route exact path='/Workouts' component={Workouts} />
                         <Route exact path='/Exercises' component={Exercises} />
                         <Route exact path='/Users' component={Users} />
