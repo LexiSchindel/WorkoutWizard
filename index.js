@@ -7,7 +7,7 @@ var cors = require('cors')
 const app = express();
 
 //so we can make requests on local server
-// app.use(cors())
+app.use(cors())
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));

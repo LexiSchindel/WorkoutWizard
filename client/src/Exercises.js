@@ -4,6 +4,9 @@ import { Row, Container, Col } from 'react-bootstrap'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import style from './style';
+
+const local = 'http://localhost:5000/'
+const heroku = 'https://workout-wizard.herokuapp.com/'
  
 class Exercises extends Component {
 
@@ -15,7 +18,7 @@ class Exercises extends Component {
 
     componentDidMount() {
         // Simple GET request using fetch
-        fetch('http://localhost:5000/getTable?table=Exercises')
+        fetch(heroku + 'getTable?table=Exercises')
         .then((response) => {
             return response.json();
           })
