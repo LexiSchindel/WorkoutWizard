@@ -1,11 +1,59 @@
 const express = require('express');
 const path = require('path');
 var mysql = require('./dbcon.js');
+const env = require('dotenv').config();
+var cors = require('cors')
 
 const app = express();
 
+//so we can make requests on local server
+app.use(cors())
+
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
+
+app.get('/getData', async function(req,res,next){
+    let context = {};
+    console.log("req: ", req.query.table);
+    let table = req.query.table;
+
+    //if we don't have a table name in our query string, error
+    if(!table){
+        next(err);
+        return;
+    }
+
+    let query = "SELECT * FROM `" + (process.env.CLEARDB_DATABASE_NAME || env.parsed.CLEARDB_DATABASE_NAME) +
+    "`." + table + ";";
+
+    queryDB(query, function(context){
+        console.log("context", context);
+        res.send(context);
+    });
+});
+
+function queryDB(query, callback){
+    console.log("queryDB");
+    mysql.pool.query(query, function(err, rows){
+        if(err){
+            console.log('error');
+            next(err);
+        }
+        console.log("row: ", rows);
+        callback(rows);
+    });
+}
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname+'/client/build/index.html'));
+  });
+  
+  const port = process.env.PORT || 5000;
+  app.listen(port);
+  
+  console.log(`Workout Wizard listening on ${port}`);
+
+
 
 // app.get('/addUsers',function(req,res,next){
 //     var context = {};
@@ -42,14 +90,3 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 //         });
 //     });
 // });
-
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname+'/client/build/index.html'));
-});
-
-const port = process.env.PORT || 5000;
-app.listen(port);
-
-console.log(`Workout Wizard listening on ${port}`);
