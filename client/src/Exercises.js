@@ -15,7 +15,7 @@ class Exercises extends Component {
 
     componentDidMount() {
         // Simple GET request using fetch
-        fetch('http://localhost:5000/getTable?table=Exercises', {mode: 'cors'})
+        fetch('http://localhost:5000/getTable?table=Exercises')
         .then((response) => {
             return response.json();
           })

@@ -16,7 +16,7 @@ class Workouts extends Component {
 
     componentDidMount() {
         // Simple GET request using fetch
-        fetch('http://localhost:5000/getTable?table=Workouts', {mode: 'cors'})
+        fetch('http://localhost:5000/getTable?table=Workouts')
         .then((response) => {
             return response.json();
           })
@@ -30,7 +30,7 @@ class Workouts extends Component {
         .catch(error => this.setState({ error, isLoading: false }));
 
         // Get the Users
-        fetch('http://localhost:5000/getUsers', {mode: 'cors'})
+        fetch('http://localhost:5000/getUsers')
         .then((response) => {
             return response.json();
           })
