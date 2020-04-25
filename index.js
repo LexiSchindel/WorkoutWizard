@@ -12,7 +12,14 @@ app.use(cors())
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.get('/getData', async function(req,res,next){
+/*********************************************************
+/getTable handle:  
+Grabs all the data from the table (based on the passed
+table name from the query string) and returns to the client.
+Receives: table from query string
+Returns: all rows from that table
+*********************************************************/
+app.get('/getTable', async function(req,res,next){
     let context = {};
     console.log("req: ", req.query.table);
     let table = req.query.table;
@@ -26,14 +33,23 @@ app.get('/getData', async function(req,res,next){
     let query = "SELECT * FROM `" + (process.env.CLEARDB_DATABASE_NAME || env.parsed.CLEARDB_DATABASE_NAME) +
     "`." + table + ";";
 
-    queryDB(query, function(context){
+    //execute the query and the send the results back to the client
+    executeQuery(query, function(context){
         console.log("context", context);
         res.send(context);
     });
 });
 
-function queryDB(query, callback){
-    console.log("queryDB");
+/*********************************************************
+executeQuery: 
+Executes the query and returns all the rows
+from the results back to the callback which well send to 
+the client
+Receives: query - query string; callback - callback function
+Returns: nothing (sends back rows to callback function)
+*********************************************************/
+function executeQuery(query, callback){
+    console.log("executeQuery");
     mysql.pool.query(query, function(err, rows){
         if(err){
             console.log('error');
@@ -54,7 +70,10 @@ app.get('*', (req, res) => {
   console.log(`Workout Wizard listening on ${port}`);
 
 
-
+/*********************************************************
+This is something I was using to add new tables/rows to the
+database.
+*********************************************************/
 // app.get('/addUsers',function(req,res,next){
 //     var context = {};
 //     var createString = "CREATE TABLE IF NOT EXISTS Muscle_Groups (" +
