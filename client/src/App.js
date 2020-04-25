@@ -7,7 +7,7 @@ function App() {
     <div className="main-page">
       <div className="light-on-dark">
         <div className="section">
-        <NavBarMain />
+          <NavBarMain />
         </div>
         <div className="dark-on-light section">
         </div>
