@@ -58,6 +58,45 @@ app.get('/getUsers', async function(req,res,next){
 });
 
 /*********************************************************
+/getWorkouts handle:  
+Grabs all the data from the table (based on the passed
+table name from the query string) and returns to the client.
+Receives: nothing
+Returns: all rows from that table
+*********************************************************/
+app.get('/getWorkouts', async function(req,res,next){
+
+    //query returns workout id, workout name, user name, exercise names,
+    //sets, reps, exercise order, and the total # of exercises in workout
+    let query = "select " +
+    "ww.id, " +
+    "ww.name as workout_name, " +
+    "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
+    "ee.name as exercise_name, " +
+    "we.sets, " +
+    "we.reps, " +
+    "we.exercise_order, " +
+    "COALESCE(tt.total_exercises,1) as total_exercises " +
+    
+    "from workouts ww " +
+    "left join workouts_exercises we on we.workout_id = ww.id " +
+    "left join users uu on uu.id = ww.user_id " +
+    "left join exercises ee on ee.id = we.exercise_id " +
+    "left join (select workout_id, count(*) as total_exercises "  +
+    "from workouts_exercises " +
+    "group by 1) tt on tt.workout_id = ww.id " +
+    
+    "order by ww.id, we.exercise_order" +
+    ";";
+
+    //execute the query and the send the results back to the client
+    executeQuery(query, function(context){
+        // console.log("context", context);
+        res.send(context);
+    });
+});
+
+/*********************************************************
 executeQuery: 
 Executes the query and returns all the rows
 from the results back to the callback which well send to 

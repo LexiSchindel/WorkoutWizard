@@ -15,7 +15,7 @@ class Exercises extends Component {
 
     componentDidMount() {
         // Simple GET request using fetch
-        fetch('getTable?table=Exercises')
+        fetch('/getTable?table=Exercises')
         .then((response) => {
             return response.json();
           })
