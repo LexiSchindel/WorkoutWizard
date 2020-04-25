@@ -20,7 +20,6 @@ Receives: table from query string
 Returns: all rows from that table
 *********************************************************/
 app.get('/getTable', async function(req,res,next){
-    console.log("req: ", req.query.table);
     let table = req.query.table;
 
     //if we don't have a table name in our query string, error
@@ -67,7 +66,6 @@ Receives: query - query string; callback - callback function
 Returns: nothing (sends back rows to callback function)
 *********************************************************/
 function executeQuery(query, callback){
-    console.log("executeQuery");
     mysql.pool.query(query, function(err, rows){
         if(err){
             console.log('error');
