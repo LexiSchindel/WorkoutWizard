@@ -4,6 +4,9 @@ import { Row, Container, Col } from 'react-bootstrap'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import style from './style';
+
+const local = 'http://localhost:5000/'
+const heroku = 'https://workout-wizard.herokuapp.com/'
  
 class Workouts extends Component {
 
@@ -16,7 +19,7 @@ class Workouts extends Component {
 
     componentDidMount() {
         // Simple GET request using fetch
-        fetch('http://localhost:5000/getTable?table=Workouts')
+        fetch(heroku + 'getTable?table=Workouts')
         .then((response) => {
             return response.json();
           })
@@ -30,7 +33,7 @@ class Workouts extends Component {
         .catch(error => this.setState({ error, isLoading: false }));
 
         // Get the Users
-        fetch('http://localhost:5000/getUsers')
+        fetch(heroku + 'getUsers')
         .then((response) => {
             return response.json();
           })
