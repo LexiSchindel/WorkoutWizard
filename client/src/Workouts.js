@@ -16,7 +16,7 @@ class Workouts extends Component {
 
     componentDidMount() {
         // Simple GET request using fetch
-        fetch('/getTable?table=Workouts')
+        fetch('/getWorkouts')
         .then((response) => {
             return response.json();
           })
@@ -46,6 +46,8 @@ class Workouts extends Component {
 
     render() {
         const { isLoading, data, error, users } = this.state;
+        console.log("data: ", data);
+        let rowKey = 0;
 
         return (
         <div>
@@ -71,7 +73,7 @@ class Workouts extends Component {
                   </Form.Group>
 
                   <Form.Group as={Col} controlId="User">
-                    <Form.Label>User</Form.Label>
+                    <Form.Label>Workout Author</Form.Label>
                     <Form.Control as="select" placeholder="Search...">
                       <option>Choose...</option>
 
@@ -104,9 +106,11 @@ class Workouts extends Component {
                     <tr>
                         <th>ID</th>
                         <th>Workout Name</th>
-                        <th>Workout Created</th>
-                        <th>Workout Updated</th>
-                        <th>User Id</th>
+                        <th>Workout Author</th>
+                        <th>Exercise</th>
+                        <th>Reps</th>
+                        <th>Sets</th>
+                        <th>Exercise Order</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,19 +119,37 @@ class Workouts extends Component {
                 {error ? <tr><td>{error.message}</td></tr> : null}
                 {/* Here's our data check */}
                 {!isLoading ? (
-                    data.map(data => {
-                    const { id, name, created_at, updated_at, user_id } = data;
+                    
+                    data.map((data, i) => {
+                    const { id, workout_name, user_name, exercise_name, 
+                      sets, reps, exercise_order, total_exercises } = data;
+                    if (rowKey != id){
+                      rowKey = id;
+                    
                     return (
-                        
-                                <tr key={id}>
-                                    <td>{id}</td>
-                                    <td>{name}</td>
-                                    <td>{created_at}</td>
-                                    <td>{updated_at}</td>
-                                    <td>{user_id}</td>
+
+                                <tr rowSpan={total_exercises} key={i} id={id}>
+                                  <td >{id}</td>
+                                  <td >{workout_name}</td>
+                                  <td >{user_name}</td>
+                                  <td>{exercise_name}</td>
+                                  <td>{sets}</td>
+                                  <td>{reps}</td>
+                                  <td>{exercise_order}</td>
                                 </tr>
-    
                     );
+                  }
+                  else {
+                    return (
+                      <tr key={i} id={id}>
+                      <td colSpan="3"></td>
+                      <td>{exercise_name}</td>
+                      <td>{sets}</td>
+                      <td>{reps}</td>
+                      <td>{exercise_order}</td>
+                      </tr>
+                    );
+                  }
                     })
                 // If there is a delay in data, let's let the user know it's loading
                 ) : (
