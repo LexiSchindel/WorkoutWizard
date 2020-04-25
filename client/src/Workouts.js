@@ -123,7 +123,7 @@ class Workouts extends Component {
                     data.map((data, i) => {
                     const { id, workout_name, user_name, exercise_name, 
                       sets, reps, exercise_order, total_exercises } = data;
-                    if (rowKey != id){
+                    if (rowKey !== id){
                       rowKey = id;
                     
                     return (
