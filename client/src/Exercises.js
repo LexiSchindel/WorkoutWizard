@@ -15,7 +15,7 @@ class Exercises extends Component {
 
     componentDidMount() {
         // Simple GET request using fetch
-        fetch('http://localhost:5000/getData?table=Exercises', {mode: 'cors'})
+        fetch('http://localhost:5000/getTable?table=Exercises', {mode: 'cors'})
         .then((response) => {
             return response.json();
           })
@@ -25,8 +25,8 @@ class Exercises extends Component {
               isLoading: false,
             })
           )
-          // Catch any errors we hit and update the app
-          .catch(error => this.setState({ error, isLoading: false }));
+        // Catch any errors we hit and update the app
+        .catch(error => this.setState({ error, isLoading: false }));
     }
 
     render() {
