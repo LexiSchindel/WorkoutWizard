@@ -20,7 +20,6 @@ Receives: table from query string
 Returns: all rows from that table
 *********************************************************/
 app.get('/getTable', async function(req,res,next){
-    let context = {};
     console.log("req: ", req.query.table);
     let table = req.query.table;
 
@@ -35,7 +34,26 @@ app.get('/getTable', async function(req,res,next){
 
     //execute the query and the send the results back to the client
     executeQuery(query, function(context){
-        console.log("context", context);
+        // console.log("context", context);
+        res.send(context);
+    });
+});
+
+/*********************************************************
+/getUsers handle:  
+Grabs all the data from the table (based on the passed
+table name from the query string) and returns to the client.
+Receives: nothing
+Returns: all rows from that table
+*********************************************************/
+app.get('/getUsers', async function(req,res,next){
+
+    let query = "SELECT id, CONCAT(first_name, ' ', last_name) as user_name FROM `" + (process.env.CLEARDB_DATABASE_NAME || env.parsed.CLEARDB_DATABASE_NAME) +
+    "`.users;";
+
+    //execute the query and the send the results back to the client
+    executeQuery(query, function(context){
+        // console.log("context", context);
         res.send(context);
     });
 });
@@ -55,7 +73,7 @@ function executeQuery(query, callback){
             console.log('error');
             next(err);
         }
-        console.log("row: ", rows);
+        // console.log("row: ", rows);
         callback(rows);
     });
 }
