@@ -10,6 +10,7 @@ class Exercises extends Component {
     state = {
         isLoading: true,
         data: [],
+        muscleGroups: [],
         error: null
       }
 
@@ -27,10 +28,24 @@ class Exercises extends Component {
           )
         // Catch any errors we hit and update the app
         .catch(error => this.setState({ error, isLoading: false }));
+
+         // Get the Users
+         fetch('/getTable?table=Muscle_Groups')
+         .then((response) => {
+             return response.json();
+           })
+           .then(muscleGroups =>
+             this.setState({
+               muscleGroups: muscleGroups,
+               isLoading: false,
+             })
+           )
+         // Catch any errors we hit and update the app
+         .catch(error => this.setState({ error, isLoading: false }));
     }
 
     render() {
-        const { isLoading, data, error } = this.state;
+        const { isLoading, data, error, muscleGroups } = this.state;
 
         return (
         <div>
@@ -49,14 +64,36 @@ class Exercises extends Component {
                 <Col>
                 <div style={style.inputForm}>
                     <Form>
-                        <Form.Group controlId="formExercise">
-                            <Form.Label>Exercise</Form.Label>
+                        <Form.Label>Add Exercise</Form.Label>
+                        
+                        <Form.Row>
+                        <Form.Group as={Col} controlId="formExercise">
                             <Form.Control 
                             required 
                             type="text" 
                             name="exerciseName"
-                            placeholder="Enter new exercise" />
+                            placeholder="Exercise name" />
                         </Form.Group>
+                        
+                        <Form.Group as={Col} controlId="formMuscleGroup">
+                            {/* <Form.Label>Workout Author</Form.Label> */}
+                            <Form.Control as="select" placeholder="Search...">
+                                <option>Select Muscle Group...</option>
+
+                                {/* Loops through user names to populate form dropdown */}
+                                {muscleGroups.map(muscleGroups => {
+                                const { id, name } = muscleGroups;
+                                return (
+                                    <option key={id}>{name}</option>
+                                );
+                                })}
+
+                    </Form.Control>
+                  </Form.Group>
+
+
+                        </Form.Row>
+                        
                         <Button 
                         variant="primary" 
                         type="submit">
