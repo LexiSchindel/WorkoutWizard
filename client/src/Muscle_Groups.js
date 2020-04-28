@@ -5,14 +5,7 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import style from './style';
  
-class Users extends Component {
-
-	// componentDidMount() {
-    //     // Simple GET request using fetch
-    //     fetch('http://localhost:5000/addUsers')
-    //         .then(response => response.json())
-    //         .then(data => this.setState({ totalReactPackages: data.total }));
-    // }
+class Muscle_Groups extends Component {
 
     state = {
         isLoading: true,
@@ -22,7 +15,7 @@ class Users extends Component {
 
     componentDidMount() {
         // Simple GET request using fetch
-        fetch('/getTable?table=Users')
+        fetch('/getTable?table=Muscle_Groups')
         .then((response) => {
             return response.json();
           })
@@ -45,8 +38,8 @@ class Users extends Component {
             <br />
                 <Row>
                     <div>
-                        <p>A list of all gym employees with access to the website.
-                            Add a user if someone new needs to create or view workouts.
+                        <p>Muscle Groups are used to categorize exercises.
+                            Please add new muscle groups to further develop our library.
                         </p>
                     </div>
                 </Row>
@@ -56,41 +49,14 @@ class Users extends Component {
                 <Col>
                 <div style={style.inputForm}>
                     <Form>
-                        <Form.Label>Add User</Form.Label>
-
-                        <Form.Row>
-                        <Form.Group as={Col} controlId="usersFirstName">
-                            {/* <Form.Label>Add User</Form.Label> */}
+						<Form.Label>Add Muscle Group</Form.Label>
+                        <Form.Group controlId="formMuscleGroups">
                             <Form.Control 
                             required 
                             type="text" 
-                            name="userName"
-                            placeholder="First name" />
+                            name="muscleGroupName"
+                            placeholder="Muscle group name" />
                         </Form.Group>
-
-                        <Form.Group as={Col} controlId="userLastName">
-                            {/* <Form.Label>Last Name</Form.Label> */}
-                            <Form.Control 
-                            required 
-                            type="text" 
-                            name="userName"
-                            placeholder="Last name" />
-                        </Form.Group>
-                        {/* </Form.Row> */}
-
-                        {/* <Form.Row> */}
-                        <Form.Group as={Col} controlId="userEmail">
-                            {/* <Form.Label>Last Name</Form.Label> */}
-                            <Form.Control 
-                            required 
-                            type="text" 
-                            name="userEmail"
-                            placeholder="Email" />
-                        </Form.Group>
-                        </Form.Row>
-
-
-
                         <Button 
                         variant="primary" 
                         type="submit">
@@ -108,9 +74,7 @@ class Users extends Component {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
+                        <th>Muscle Group</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -120,14 +84,12 @@ class Users extends Component {
                 {/* Here's our data check */}
                 {!isLoading ? (
                     data.map(data => {
-                    const { id, first_name, last_name, email } = data;
+                    const { id, name } = data;
                     return (
                         
                                 <tr key={id}>
                                     <td>{id}</td>
-                                    <td>{first_name}</td>
-                                    <td>{last_name}</td>
-                                    <td>{email}</td>
+                                    <td>{name}</td>
                                 </tr>
     
                     );
@@ -146,4 +108,4 @@ class Users extends Component {
     }
 }
  
-export default Users;
+export default Muscle_Groups;

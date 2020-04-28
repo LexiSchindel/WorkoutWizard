@@ -4,6 +4,7 @@ import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
 import Home from "./Home";
 import Workouts from "./Workouts";
 import Exercises from "./Exercises";
+import Muscle_Groups from "./Muscle_Groups";
 import Users from "./Users";
 
 class NavBarMain extends React.Component {
@@ -23,7 +24,10 @@ class NavBarMain extends React.Component {
                                 <NavItem eventkey={2} href="/Exercises">
                                     <Nav.Link as={Link} to="/Exercises" >Exercises</Nav.Link>
                                 </NavItem>
-                                <NavItem eventkey={3} href="/Users">
+                                <NavItem eventkey={3} href="/Muscle_Groups">
+                                    <Nav.Link as={Link} to="/Muscle_Groups" >Muscle Groups</Nav.Link>
+                                </NavItem>
+                                <NavItem eventkey={4} href="/Users">
                                     <Nav.Link as={Link} to="/Users" >Users</Nav.Link>
                                 </NavItem>
                             </Nav>
@@ -35,6 +39,7 @@ class NavBarMain extends React.Component {
                         <Route exact path='/' component={Home} />
                         <Route exact path='/Workouts' component={Workouts} />
                         <Route exact path='/Exercises' component={Exercises} />
+                        <Route exact path='/Muscle_Groups' component={Muscle_Groups} />
                         <Route exact path='/Users' component={Users} />
                         <Route render={function () {
                             return <p>Not found</p>
