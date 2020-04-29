@@ -43,7 +43,6 @@ class Home extends Component {
 
     render() {
         const { isLoading, data, error } = this.state;
-        console.log("data: ", data);
         let rowKey = 0;
 
         return (
