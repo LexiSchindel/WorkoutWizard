@@ -97,6 +97,35 @@ app.get('/getWorkouts', async function(req,res,next){
 });
 
 /*********************************************************
+/getExercises_MuscleGroups handle:  
+Grabs all the data from the table (based on the passed
+table name from the query string) and returns to the client.
+Receives: nothing
+Returns: all rows from that table
+*********************************************************/
+app.get('/getExercises_MuscleGroups', async function(req,res,next){
+
+    //query returns workout id, workout name, user name, exercise names,
+    //sets, reps, exercise order, and the total # of exercises in workout
+    let query = "SELECT " +
+    "emg.id, " +
+    "ee.name as exercise_name, " +
+    "mg.name as musclegrp_name " +
+    
+    "FROM exercises_musclegroups emg " +
+    "JOIN exercises ee on ee.id = emg.exercise_id " +
+    "JOIN muscle_groups mg on mg.id = emg.musclegrp_id " +
+    "ORDER BY emg.id ASC" +
+    ";";
+
+    //execute the query and the send the results back to the client
+    executeQuery(query, function(context){
+        // console.log("context", context);
+        res.send(context);
+    });
+});
+
+/*********************************************************
 executeQuery: 
 Executes the query and returns all the rows
 from the results back to the callback which well send to 

@@ -20,7 +20,9 @@ class Exercises_MuscleGroups extends Component {
 
     componentDidMount() {
         // Simple GET request using fetch
-        fetch('/getTable?table=Exercises')
+        // fetch('/getTable?table=Exercises')
+        // fetch('/getTable?table=Exercises_MuscleGroups')
+        fetch('/getExercises_MuscleGroups')
         .then((response) => {
             return response.json();
           })
@@ -138,6 +140,8 @@ class Exercises_MuscleGroups extends Component {
                     <tr>
                         <th>ID</th>
                         <th>Exercise</th>
+                        <th>Muscle Group</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -146,13 +150,15 @@ class Exercises_MuscleGroups extends Component {
                 {error ? <tr><td>{error.message}</td></tr> : null}
                 {/* Here's our data check */}
                 {!isLoading ? (
+                    
                     data.map(data => {
-                    const { id, name } = data;
+                    const { id, exercise_name, musclegrp_name } = data;
                     return (
                         
                                 <tr key={id}>
                                     <td>{id}</td>
-                                    <td>{name}</td>
+                                    <td>{exercise_name}</td>
+                                    <td>{musclegrp_name}</td>
                                 </tr>
     
                     );
