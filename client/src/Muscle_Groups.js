@@ -4,7 +4,7 @@ import { Row, Container, Col } from 'react-bootstrap'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import style from './style';
- 
+
 class Muscle_Groups extends Component {
 
     state = {

@@ -6,6 +6,7 @@ import Workouts from "./Workouts";
 import Exercises from "./Exercises";
 import Muscle_Groups from "./Muscle_Groups";
 import Users from "./Users";
+import Exercises_MuscleGroups from "./Exercises_MuscleGroups";
 
 class NavBarMain extends React.Component {
     render() {
@@ -30,6 +31,9 @@ class NavBarMain extends React.Component {
                                 <NavItem eventkey={4} href="/Users">
                                     <Nav.Link as={Link} to="/Users" >Users</Nav.Link>
                                 </NavItem>
+                                <NavItem eventkey={5} href="/Exercises_MuscleGroups">
+                                    <Nav.Link as={Link} to="/Exercises_MuscleGroups" >Exercises_MuscleGroups</Nav.Link>
+                                </NavItem>
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>
@@ -41,6 +45,7 @@ class NavBarMain extends React.Component {
                         <Route exact path='/Exercises' component={Exercises} />
                         <Route exact path='/Muscle_Groups' component={Muscle_Groups} />
                         <Route exact path='/Users' component={Users} />
+                        <Route exact path='/Exercises_MuscleGroups' component={Exercises_MuscleGroups} />
                         <Route render={function () {
                             return <p>Not found</p>
                         }} />

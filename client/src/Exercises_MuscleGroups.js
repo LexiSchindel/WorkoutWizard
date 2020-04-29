@@ -4,13 +4,17 @@ import { Row, Container, Col } from 'react-bootstrap'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import style from './style';
+
+// import ReactDOM from "react-dom";
+
  
-class Exercises extends Component {
+class Exercises_MuscleGroups extends Component {
 
     state = {
         isLoading: true,
-        data: [],
-        muscleGroups: [],
+		data: [],
+		exercises: [],
+		muscleGroups: [],
         error: null
       }
 
@@ -29,6 +33,22 @@ class Exercises extends Component {
         // Catch any errors we hit and update the app
         .catch(error => this.setState({ error, isLoading: false }));
 
+
+		// Get the Exercises
+		fetch('/getTable?table=Exercises')
+		.then((response) => {
+			return response.json();
+		  })
+		  .then(exercises =>
+			this.setState({
+			  exercises: exercises,
+			  isLoading: false,
+			})
+		  )
+		// Catch any errors we hit and update the app
+		.catch(error => this.setState({ error, isLoading: false }));
+
+
          // Get the Muscle Groups
          fetch('/getTable?table=Muscle_Groups')
          .then((response) => {
@@ -45,7 +65,7 @@ class Exercises extends Component {
     }
 
     render() {
-        const { isLoading, data, error, muscleGroups } = this.state;
+        const { isLoading, data, error, exercises, muscleGroups } = this.state;
 
         return (
         <div>
@@ -53,8 +73,8 @@ class Exercises extends Component {
             <br />
                 <Row>
                     <div>
-                        <p>A variety of exercises you can add to your workouts.
-                            Please add new exercises to further develop our library.
+                        <p>Link exercises wit muscle groups.
+                            Add connections to help with searching our library.
                         </p>
                     </div>
                 </Row>
@@ -64,20 +84,28 @@ class Exercises extends Component {
                 <Col>
                 <div style={style.inputForm}>
                     <Form>
-                        <Form.Label>Add Exercise</Form.Label>
+                        <Form.Label>Add Exercise/ Muscle Group Associations</Form.Label>
                         
                         <Form.Row>
-                        <Form.Group as={Col} controlId="formExercise">
-                            <Form.Control 
-                            required 
-                            type="text" 
-                            name="exerciseName"
-                            placeholder="Exercise name" />
+						<Form.Group as={Col} controlId="formExercise">
+                            {/* <Form.Label>Workout Author</Form.Label> */}
+                            <Form.Control as="select" placeholder="Search...">
+                                <option>Select Exercise...</option>
+
+                                {/* Loops through user names to populate form dropdown */}
+                                {exercises.map(exercises => {
+                                const { id, name } = exercises;
+                                return (
+                                    <option key={id}>{name}</option>
+                                );
+                                })}
+
+                            </Form.Control>
                         </Form.Group>
                         
                         <Form.Group as={Col} controlId="formMuscleGroup">
                             {/* <Form.Label>Workout Author</Form.Label> */}
-                            <Form.Control as="select" placeholder="Search..." required>
+                            <Form.Control as="select" placeholder="Search...">
                                 <option>Select Muscle Group...</option>
 
                                 {/* Loops through user names to populate form dropdown */}
@@ -144,4 +172,4 @@ class Exercises extends Component {
     }
 }
  
-export default Exercises;
+export default Exercises_MuscleGroups;
