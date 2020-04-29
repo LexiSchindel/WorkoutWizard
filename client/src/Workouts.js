@@ -11,6 +11,7 @@ class Workouts extends Component {
         isLoading: true,
         data: [],
         users: [],
+        exercises: [],
         error: null
       }
 
@@ -42,10 +43,24 @@ class Workouts extends Component {
           )
         // Catch any errors we hit and update the app
         .catch(error => this.setState({ error, isLoading: false }));
+
+        // Get the Exercises
+        fetch('/getTable?table=Exercises')
+         .then((response) => {
+             return response.json();
+           })
+           .then(exercises =>
+             this.setState({
+              exercises: exercises,
+               isLoading: false,
+             })
+           )
+         // Catch any errors we hit and update the app
+         .catch(error => this.setState({ error, isLoading: false }));
     }
 
     render() {
-        const { isLoading, data, error, users } = this.state;
+        const { isLoading, data, error, users, exercises} = this.state;
         console.log("data: ", data);
         let rowKey = 0;
 
@@ -88,6 +103,35 @@ class Workouts extends Component {
                     </Form.Control>
                   </Form.Group>
                   </Form.Row>
+
+                  <Form.Row>
+                  <Form.Group as={Col} controlId="exerciseName">
+                    <Form.Label>Exercise</Form.Label>
+                    <Form.Control as="select" placeholder="Search...">
+                      <option>Choose...</option>
+
+                      {/* Loops through user names to populate form dropdown */}
+                      {exercises.map(exercises => {
+                        const { id, name } = exercises;
+                        return (
+                          <option key={id}>{name}</option>
+                        );
+                        })}
+
+                    </Form.Control>
+                  </Form.Group>
+
+                  <Form.Group as={Col} controlId="repCount">
+                    <Form.Label>Reps</Form.Label>
+                    <Form.Control />
+                  </Form.Group>
+
+                  <Form.Group as={Col} controlId="setCount">
+                    <Form.Label>Sets</Form.Label>
+                    <Form.Control />
+                  </Form.Group>
+                  </Form.Row>
+
                   <Button 
                     variant="primary" 
                     type="submit">
