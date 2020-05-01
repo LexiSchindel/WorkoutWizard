@@ -53,57 +53,7 @@ class Users extends Component {
                 </Row>
             <br />
 
-            {/* ADD */}
-            <Row>
-                <Col>
-                <div style={style.inputForm}>
-                    <Form>
-                        <Form.Label>Add User</Form.Label>
-
-                        <Form.Row>
-                        <Form.Group as={Col} controlId="usersFirstName">
-                            {/* <Form.Label>Add User</Form.Label> */}
-                            <Form.Control 
-                            required 
-                            type="text" 
-                            name="userName"
-                            placeholder="First name" />
-                        </Form.Group>
-
-                        <Form.Group as={Col} controlId="userLastName">
-                            {/* <Form.Label>Last Name</Form.Label> */}
-                            <Form.Control 
-                            required 
-                            type="text" 
-                            name="userName"
-                            placeholder="Last name" />
-                        </Form.Group>
-                        {/* </Form.Row> */}
-
-                        {/* <Form.Row> */}
-                        <Form.Group as={Col} controlId="userEmail">
-                            {/* <Form.Label>Last Name</Form.Label> */}
-                            <Form.Control 
-                            required 
-                            type="text" 
-                            name="userEmail"
-                            placeholder="Email" />
-                        </Form.Group>
-                        </Form.Row>
-
-
-
-                        <Button 
-                        variant="primary" 
-                        type="submit">
-                            Submit
-                        </Button>
-                    </Form>
-                </div>
-                </Col>
-            </Row>
-            <br />
-            <br />
+            
 
 
             {/* SEARCH */}
@@ -157,12 +107,7 @@ class Users extends Component {
                         </fieldset>
                         </Form.Group>
 
-
-      
-                        
                         </Form.Row>
-
-
 
                         <Button 
                         variant="primary" 
@@ -218,7 +163,61 @@ class Users extends Component {
                 </tbody>
             </Table>
             </Row>
+            <br />
+            <br />
+
+            {/* ADD */}
+            <Row>
+                <Col>
+                <div style={style.inputForm}>
+                    <Form>
+                        <Form.Label>Add User</Form.Label>
+
+                        <Form.Row>
+                        <Form.Group as={Col} controlId="usersFirstName">
+                            {/* <Form.Label>Add User</Form.Label> */}
+                            <Form.Control 
+                            required 
+                            type="text" 
+                            name="userName"
+                            placeholder="First name" />
+                        </Form.Group>
+
+                        <Form.Group as={Col} controlId="userLastName">
+                            {/* <Form.Label>Last Name</Form.Label> */}
+                            <Form.Control 
+                            required 
+                            type="text" 
+                            name="userName"
+                            placeholder="Last name" />
+                        </Form.Group>
+                        {/* </Form.Row> */}
+
+                        {/* <Form.Row> */}
+                        <Form.Group as={Col} controlId="userEmail">
+                            {/* <Form.Label>Last Name</Form.Label> */}
+                            <Form.Control 
+                            required 
+                            type="text" 
+                            name="userEmail"
+                            placeholder="Email" />
+                        </Form.Group>
+                        </Form.Row>
+
+                        <Button 
+                        variant="primary" 
+                        type="submit">
+                            Submit
+                        </Button>
+                    </Form>
+                </div>
+                </Col>
+            </Row>
+            
+
             </Container>
+
+            
         </div>
         );
     }
