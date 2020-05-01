@@ -72,9 +72,14 @@ class Exercises extends Component {
                             You can insert an exercise at the beginning, end or middle of 
                             the workout selected by choosing the appropriate Exercise Order.
                             <br />
+                            <br />
                             If you choose an Exercise Order number greater than the total
                             exercises currently included in the workout, the new exercise 
                             will be inserted at the end of the Workout.
+                            <br />
+                            <br />
+                            If you delete an Exercise from a workout, the remaining exercises will
+                            move adjust order so order is maintained without gaps.
                         </p>
                     </div>
                 </Row>
@@ -162,6 +167,7 @@ class Exercises extends Component {
                         <th>Reps</th>
                         <th>Sets</th>
                         <th>Exercise Order</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -183,6 +189,13 @@ class Exercises extends Component {
                                     <td>{sets}</td>
                                     <td>{reps}</td>
                                     <td>{exercise_order}</td>
+                                    <td>
+                                        <Button 
+                                        variant="outline-danger" 
+                                        type="delete">
+                                            Delete Exercise
+                                        </Button>
+                                  </td>
                                 </tr>
     
                     );
