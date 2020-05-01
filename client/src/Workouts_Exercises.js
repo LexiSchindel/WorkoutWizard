@@ -162,6 +162,7 @@ class Exercises extends Component {
                         <th>Reps</th>
                         <th>Sets</th>
                         <th>Exercise Order</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -183,6 +184,13 @@ class Exercises extends Component {
                                     <td>{sets}</td>
                                     <td>{reps}</td>
                                     <td>{exercise_order}</td>
+                                    <td>
+                                        <Button 
+                                        variant="outline-danger" 
+                                        type="delete">
+                                            Delete Exercise
+                                        </Button>
+                                  </td>
                                 </tr>
     
                     );
