@@ -4,6 +4,7 @@ import { Row, Container, Col } from 'react-bootstrap'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import style from './style';
+import Spinner from 'react-bootstrap/Spinner'
  
 class Users extends Component {
 
@@ -52,6 +53,7 @@ class Users extends Component {
                 </Row>
             <br />
 
+            {/* ADD */}
             <Row>
                 <Col>
                 <div style={style.inputForm}>
@@ -103,6 +105,78 @@ class Users extends Component {
             <br />
             <br />
 
+
+            {/* SEARCH */}
+            <Row>
+                <Col>
+                <div style={style.inputForm}>
+                    <Form>
+                        <Form.Label>Search User</Form.Label>
+
+                        <Form.Row>
+                        <Form.Group as={Col} controlId="searchParameter">
+                            {/* <Form.Label>Add User</Form.Label> */}
+                            <Form.Control 
+                            required 
+                            type="text" 
+                            name="searchParameter"
+                            placeholder="First name, Last name, or email" />
+                        </Form.Group>
+                        </Form.Row>
+
+                    
+                        <Form.Row>
+
+                        <Form.Group as={Col} controlId="userLastName">
+                        <fieldset>
+                            <Form.Group as={Row}>
+                            <Form.Label as="legend" column sm={12}>
+                                Search parameter type
+                            </Form.Label>
+                            <Col sm={12}>
+                                <Form.Check
+                                type="radio"
+                                label="First name"
+                                name="formHorizontalRadios"
+                                id="formHorizontalRadios1"
+                                />
+                                <Form.Check
+                                type="radio"
+                                label="Last name"
+                                name="formHorizontalRadios"
+                                id="formHorizontalRadios2"
+                                />
+                                <Form.Check
+                                type="radio"
+                                label="Email"
+                                name="formHorizontalRadios"
+                                id="formHorizontalRadios3"
+                                />
+                            </Col>
+                            </Form.Group>
+                        </fieldset>
+                        </Form.Group>
+
+
+      
+                        
+                        </Form.Row>
+
+
+
+                        <Button 
+                        variant="primary" 
+                        type="submit">
+                            Search
+                        </Button>
+                    </Form>
+                </div>
+                </Col>
+            </Row>
+            <br />
+            <br />
+
+            {/* TABLE */}
             <Row>
             <Table striped bordered hover size="sm" responsive>
                 <thead>
@@ -134,7 +208,11 @@ class Users extends Component {
                     })
                 // If there is a delay in data, let's let the user know it's loading
                 ) : (
-                    <tr><td>Loading...</td></tr>
+                    <tr><td colspan="4">
+                        <Spinner animation="border" size ="sm" role="status">
+                            <span className="sr-only">Loading...</span>
+                        </Spinner>
+                    </td></tr>
                 )}
 
                 </tbody>
