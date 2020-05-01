@@ -70,7 +70,9 @@ class Workouts extends Component {
                 <Row>
                     <div>
                         <p>Here are the current Workouts in the repository.
-                          You can add a new one of your own. 
+                          You can add a new one of your own. Since a workout must have 
+                          at least one exercise, you must enter an exercise when you 
+                          enter a new workout.
                         </p>
                     </div>
                 </Row>

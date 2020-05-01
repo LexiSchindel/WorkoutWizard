@@ -3,6 +3,7 @@ import { Nav, Navbar, NavItem } from 'react-bootstrap';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
 import Home from "./Home";
 import Workouts from "./Workouts";
+import Workouts_Exercises from "./Workouts_Exercises";
 import Exercises from "./Exercises";
 import Muscle_Groups from "./Muscle_Groups";
 import Users from "./Users";
@@ -21,6 +22,9 @@ class NavBarMain extends React.Component {
                             <Nav className="mr-auto">
                                 <NavItem eventkey={1} href="/Workouts">
                                     <Nav.Link as={Link} to="/Workouts" >Workouts</Nav.Link>
+                                </NavItem>
+                                <NavItem eventkey={1} href="/Workouts_Exercises">
+                                    <Nav.Link as={Link} to="/Workouts_Exercises" >Workouts_Exercises</Nav.Link>
                                 </NavItem>
                                 <NavItem eventkey={2} href="/Exercises">
                                     <Nav.Link as={Link} to="/Exercises" >Exercises</Nav.Link>
@@ -42,6 +46,7 @@ class NavBarMain extends React.Component {
                     <Switch>
                         <Route exact path='/' component={Home} />
                         <Route exact path='/Workouts' component={Workouts} />
+                        <Route exact path='/Workouts_Exercises' component={Workouts_Exercises} />
                         <Route exact path='/Exercises' component={Exercises} />
                         <Route exact path='/Muscle_Groups' component={Muscle_Groups} />
                         <Route exact path='/Users' component={Users} />
