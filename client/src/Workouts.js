@@ -17,7 +17,7 @@ class Workouts extends Component {
 
     componentDidMount() {
         // Simple GET request using fetch
-        fetch('/getWorkouts')
+        fetch('/getWorkoutsUsers')
         .then((response) => {
             return response.json();
           })
@@ -61,7 +61,6 @@ class Workouts extends Component {
 
     render() {
         const { isLoading, data, error, users, exercises} = this.state;
-        let rowKey = 0;
 
         return (
         <div>
@@ -77,6 +76,10 @@ class Workouts extends Component {
 
                         <p>Deleting a workout will delete the entire workout, including all exercise
                           associations in Workouts_Exercises.
+                        </p>
+
+                        <p>You can update a workout name, user (who created the workout), and even update
+                          the user to null (remove the connection between workout and user).
                         </p>
                     </div>
                 </Row>
@@ -156,11 +159,9 @@ class Workouts extends Component {
                         <th>ID</th>
                         <th>Workout Name</th>
                         <th>Workout Author</th>
-                        <th>Exercise</th>
-                        <th>Reps</th>
-                        <th>Sets</th>
-                        <th>Exercise Order</th>
+                        <th># of Exercises</th>
                         <th>Delete</th>
+                        <th>Update</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -171,47 +172,35 @@ class Workouts extends Component {
                 {!isLoading ? (
                     
                     data.map((data, i) => {
-                    const { id, workout_name, user_name, exercise_name, 
-                      sets, reps, exercise_order, total_exercises } = data;
-                    if (rowKey !== id){
-                      rowKey = id;
-                    
-                    return (
-
-                                <tr rowSpan={total_exercises} key={i} id={id}>
-                                  <td >{id}</td>
-                                  <td >{workout_name}</td>
-                                  <td >{user_name}</td>
-                                  <td>{exercise_name}</td>
-                                  <td>{sets}</td>
-                                  <td>{reps}</td>
-                                  <td>{exercise_order}</td>
-                                  <td>
-                                    <Button 
-                                      variant="outline-danger" 
-                                      type="delete">
-                                          Delete Workout
-                                    </Button>
-                                  </td>
-                                </tr>
+                      const { id, workout_name, user_name, total_exercises } = data;
+                      return (
+                          
+                                  <tr key={i}>
+                                      <td >{id}</td>
+                                      <td key = {id}>{workout_name}</td>
+                                      <td >{user_name}</td>
+                                      <td>{total_exercises}</td>
+                                      <td>
+                                          <Button 
+                                          variant="outline-danger" 
+                                          type="delete">
+                                              Delete Workout
+                                          </Button>
+                                    </td>
+                                    <td>
+                                          <Button 
+                                          variant="outline-info" 
+                                          type="update">
+                                              Update Workout
+                                          </Button>
+                                    </td>
+                                  </tr>
                     );
-                  }
-                  else {
-                    return (
-                      <tr key={i} id={id}>
-                      <td colSpan="3"></td>
-                      <td>{exercise_name}</td>
-                      <td>{sets}</td>
-                      <td>{reps}</td>
-                      <td>{exercise_order}</td>
-                      </tr>
-                    );
-                  }
-                    })
-                // If there is a delay in data, let's let the user know it's loading
-                ) : (
-                    <tr><td>Loading...</td></tr>
-                )}
+                  })
+              // If there is a delay in data, let's let the user know it's loading
+              ) : (
+                  <tr><td>Loading...</td></tr>
+              )}
 
                 </tbody>
             </Table>
