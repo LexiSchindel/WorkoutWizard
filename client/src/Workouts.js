@@ -74,6 +74,10 @@ class Workouts extends Component {
                           at least one exercise, you must enter an exercise when you 
                           enter a new workout.
                         </p>
+
+                        <p>Deleting a workout will delete the entire workout, including all exercise
+                          associations in Workouts_Exercises.
+                        </p>
                     </div>
                 </Row>
             <br />
