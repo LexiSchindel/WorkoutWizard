@@ -70,7 +70,9 @@ class Workouts extends Component {
                 <Row>
                     <div>
                         <p>Here are the current Workouts in the repository.
-                          You can add a new one of your own. 
+                          You can add a new one of your own. Since a workout must have 
+                          at least one exercise, you must enter an exercise when you 
+                          enter a new workout.
                         </p>
                     </div>
                 </Row>
@@ -154,6 +156,7 @@ class Workouts extends Component {
                         <th>Reps</th>
                         <th>Sets</th>
                         <th>Exercise Order</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -179,6 +182,13 @@ class Workouts extends Component {
                                   <td>{sets}</td>
                                   <td>{reps}</td>
                                   <td>{exercise_order}</td>
+                                  <td>
+                                    <Button 
+                                      variant="outline-danger" 
+                                      type="delete">
+                                          Delete Workout
+                                    </Button>
+                                  </td>
                                 </tr>
                     );
                   }
