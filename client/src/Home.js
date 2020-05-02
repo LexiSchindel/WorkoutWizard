@@ -51,21 +51,11 @@ class Home extends Component {
             <br />
                 <Row>
                     <div>
-                        <p>Here are the current Workouts in the repository.
+                        <p>Here are the current Workouts in the repository. This is a page to view all of 
+                          the available workouts.
                         </p>
                     </div>
                 </Row>
-            <br />
-
-            <Row>
-                  <div>
-                      <p>Some search functionality here so you can search all the 
-                        workouts in the repository by workout name, exercises, muscle
-                        groups, etc.
-                      </p>
-                  </div>
-              </Row>
-            
             <br />
             <br />
 
