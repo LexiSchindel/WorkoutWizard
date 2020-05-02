@@ -168,7 +168,6 @@ class Exercises extends Component {
                         <th>Sets</th>
                         <th>Exercise Order</th>
                         <th>Delete</th>
-                        <th>Update</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -195,13 +194,6 @@ class Exercises extends Component {
                                         variant="outline-danger" 
                                         type="delete">
                                             Delete Exercise
-                                        </Button>
-                                  </td>
-                                  <td>
-                                        <Button 
-                                        variant="outline-info" 
-                                        type="update">
-                                            Update Exercise
                                         </Button>
                                   </td>
                                 </tr>
