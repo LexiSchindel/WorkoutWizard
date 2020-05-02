@@ -1,5 +1,6 @@
 import React from 'react';
 import NavBarMain from './NavBar';
+import Routes from './Routes';
 import './App.css';
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
       <div className="light-on-dark">
         <div className="section">
           <NavBarMain />
+          <Routes />
         </div>
         <div className="dark-on-light section">
         </div>
