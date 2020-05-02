@@ -75,6 +75,7 @@ app.get('/getWorkouts', async function(req,res,next){
     "we.sets, " +
     "we.reps, " +
     "we.exercise_order, " +
+    "mg.muscle_grps, " +
     "COALESCE(tt.total_exercises,1) as total_exercises " +
     
     "from workouts ww " +
@@ -84,6 +85,11 @@ app.get('/getWorkouts', async function(req,res,next){
     "left join (select workout_id, count(*) as total_exercises "  +
     "from workouts_exercises " +
     "group by 1) tt on tt.workout_id = ww.id " +
+    "left join (select emg.exercise_id, GROUP_CONCAT(DISTINCT mg.name SEPARATOR ', ') as muscle_grps " +
+	"from exercises_musclegroups emg " +
+	"left join muscle_groups mg on mg.id = emg.musclegrp_id " +
+    "group by 1 " +
+    ") mg on mg.exercise_id = we.exercise_id " +
     
     "order by ww.id, we.exercise_order" +
     ";";

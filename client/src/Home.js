@@ -52,7 +52,6 @@ class Home extends Component {
                 <Row>
                     <div>
                         <p>Here are the current Workouts in the repository.
-                          You can add a new one of your own. 
                         </p>
                     </div>
                 </Row>
@@ -81,6 +80,7 @@ class Home extends Component {
                         <th>Reps</th>
                         <th>Sets</th>
                         <th>Exercise Order</th>
+                        <th>Muscle Groups</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -92,7 +92,7 @@ class Home extends Component {
                     
                     data.map((data, i) => {
                     const { id, workout_name, user_name, exercise_name, 
-                      sets, reps, exercise_order, total_exercises } = data;
+                      sets, reps, exercise_order, total_exercises, muscle_grps } = data;
                     if (rowKey !== id){
                       rowKey = id;
                     
@@ -106,6 +106,7 @@ class Home extends Component {
                                   <td>{sets}</td>
                                   <td>{reps}</td>
                                   <td>{exercise_order}</td>
+                                  <td>{muscle_grps}</td>
                                 </tr>
                     );
                   }
@@ -117,6 +118,7 @@ class Home extends Component {
                       <td>{sets}</td>
                       <td>{reps}</td>
                       <td>{exercise_order}</td>
+                      <td>{muscle_grps}</td>
                       </tr>
                     );
                   }
