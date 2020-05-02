@@ -12,38 +12,38 @@ class NavBarMain extends React.Component {
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="mr-auto">
                                 <NavItem eventkey={1} href="/Workouts">
-                                    <Nav.Link exact
-                                        activeClassName="navbar__link--active"
+                                    <Nav.Link
+                                        activeclassname="navbar__link--active"
                                         className="navbar__link" 
                                         as={Link} to="/Workouts" >Workouts</Nav.Link>
                                 </NavItem>
                                 <NavItem eventkey={1} href="/Workouts_Exercises">
-                                    <Nav.Link exact
-                                        activeClassName="navbar__link--active"
+                                    <Nav.Link
+                                        activeclassname="navbar__link--active"
                                         className="navbar__link" 
                                         as={Link} to="/Workouts_Exercises" >Workouts_Exercises</Nav.Link>
                                 </NavItem>
                                 <NavItem eventkey={2} href="/Exercises">
-                                    <Nav.Link exact
-                                        activeClassName="navbar__link--active"
+                                    <Nav.Link
+                                        activeclassname="navbar__link--active"
                                         className="navbar__link" 
                                          as={Link} to="/Exercises" >Exercises</Nav.Link>
                                 </NavItem>
                                 <NavItem eventkey={3} href="/Muscle_Groups">
-                                    <Nav.Link exact
-                                        activeClassName="navbar__link--active"
+                                    <Nav.Link
+                                        activeclassname="navbar__link--active"
                                         className="navbar__link" 
                                          as={Link} to="/Muscle_Groups" >Muscle Groups</Nav.Link>
                                 </NavItem>
                                 <NavItem eventkey={4} href="/Users">
-                                    <Nav.Link exact
-                                        activeClassName="navbar__link--active"
+                                    <Nav.Link
+                                        activeclassname="navbar__link--active"
                                         className="navbar__link" 
                                          as={Link} to="/Users" >Users</Nav.Link>
                                 </NavItem>
                                 <NavItem eventkey={5} href="/Exercises_MuscleGroups">
-                                    <Nav.Link exact
-                                        activeClassName="navbar__link--active"
+                                    <Nav.Link
+                                        activeclassname="navbar__link--active"
                                         className="navbar__link" 
                                          as={Link} to="/Exercises_MuscleGroups" >Exercises_MuscleGroups</Nav.Link>
                                 </NavItem>
