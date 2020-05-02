@@ -153,7 +153,7 @@ class Users extends Component {
                     })
                 // If there is a delay in data, let's let the user know it's loading
                 ) : (
-                    <tr><td colspan="4">
+                    <tr><td colSpan="4">
                         <Spinner animation="border" size ="sm" role="status">
                             <span className="sr-only">Loading...</span>
                         </Spinner>
