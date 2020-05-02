@@ -129,7 +129,6 @@ app.get('/getWorkoutsUsers', async function(req,res,next){
 
     //execute the query and the send the results back to the client
     executeQuery(query, function(context){
-        console.log("context", context);
         res.send(context);
     });
 });
