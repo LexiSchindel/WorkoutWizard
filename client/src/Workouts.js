@@ -61,7 +61,6 @@ class Workouts extends Component {
 
     render() {
         const { isLoading, data, error, users, exercises} = this.state;
-        console.log("data: ", data);
         let rowKey = 0;
 
         return (
