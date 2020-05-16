@@ -14,6 +14,47 @@ app.use(cors())
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 /*********************************************************
+parameterQuery:  
+Executes a query that has parameters (insert delete, etc)
+Receives: JSON object with text and placeholder_arr values
+Returns: rows (from query execution)
+*********************************************************/
+function parameterQuery(query) {
+    return new Promise(function(resolve, reject) {
+        try {
+            mysql.pool.query(query.text, query.placeholder_arr, function(err, rows, fields) {
+                if (err) {
+                    return reject(err);
+                } else {
+                    return resolve(rows);
+                }
+            });
+        } catch (err) {
+            return reject(err);
+        }
+    })
+};
+
+/*********************************************************
+executeQuery: 
+Executes the query and returns all the rows
+from the results back to the callback which well send to 
+the client
+Receives: query - query string; callback - callback function
+Returns: nothing (sends back rows to callback function)
+*********************************************************/
+function executeQuery(query, callback){
+    mysql.pool.query(query, function(err, rows){
+        if(err){
+            console.log('error');
+            next(err);
+        }
+        // console.log("row: ", rows);
+        callback(rows);
+    });
+}
+
+/*********************************************************
 /getTable handle:  
 Grabs all the data from the table (based on the passed
 table name from the query string) and returns to the client.
@@ -114,7 +155,7 @@ app.post('/insertWorkout', function(req,res,error){
     "VALUES (?, now(), now(), ?);"
 
     let queryText2 = "INSERT INTO Workouts_Exercises (workout_id, exercise_id, sets, reps, exercise_order) " +
-        "VALUES ((select id from Workouts where name = ?), " + //workoutName
+        "VALUES (?, " + //workoutId from the insert id returned by insert query
         "?, " + //exerciseId
         "?, ?, 1 " + //sets, reps, exerciseOrder
         ")"
@@ -124,12 +165,14 @@ app.post('/insertWorkout', function(req,res,error){
         placeholder_arr : [req.body.workoutName, req.body.User],
     };
 
-    var query2 = {
-        text : queryText2,
-        placeholder_arr : [req.body.workoutName, req.body.exerciseId, req.body.setCount, req.body.repCount],
-    };
-
-    parameterQuery(query1).then(parameterQuery(query2)).then(successCallback).catch(errorCallback);
+    parameterQuery(query1)
+    .then((row) => {
+        var query2 = {
+            text : queryText2,
+            placeholder_arr : [row.insertId, req.body.exerciseId, req.body.setCount, req.body.repCount],
+        };
+        parameterQuery(query2)})
+        .then(successCallback).catch(errorCallback);
 
     function successCallback(result){
         console.log('done',result);
@@ -138,22 +181,6 @@ app.post('/insertWorkout', function(req,res,error){
         console.log('Error while executing SQL Query',err);
       }
 });
-
-function parameterQuery(query) {
-    return new Promise(function(resolve, reject) {
-        try {
-            mysql.pool.query(query.text, query.placeholder_arr, function(err, rows, fields) {
-                if (err) {
-                    return reject(err);
-                } else {
-                    return resolve(rows);
-                }
-            });
-        } catch (err) {
-            return reject(err);
-        }
-    })
-};
 
 /*********************************************************
 /getWorkoutsUsers handle:  
@@ -216,25 +243,6 @@ app.get('/getExercises_MuscleGroups', async function(req,res,next){
     });
 });
 
-/*********************************************************
-executeQuery: 
-Executes the query and returns all the rows
-from the results back to the callback which well send to 
-the client
-Receives: query - query string; callback - callback function
-Returns: nothing (sends back rows to callback function)
-*********************************************************/
-function executeQuery(query, callback){
-    mysql.pool.query(query, function(err, rows){
-        if(err){
-            console.log('error');
-            next(err);
-        }
-        // console.log("row: ", rows);
-        callback(rows);
-    });
-}
-
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname+'/client/build/index.html'));
   });
@@ -243,44 +251,3 @@ app.get('*', (req, res) => {
   app.listen(port);
   
   console.log(`Workout Wizard listening on ${port}`);
-
-
-/*********************************************************
-This is something I was using to add new tables/rows to the
-database.
-*********************************************************/
-// app.get('/addUsers',function(req,res,next){
-//     var context = {};
-//     var createString = "CREATE TABLE IF NOT EXISTS Muscle_Groups (" +
-//         "id INT(11) AUTO_INCREMENT PRIMARY KEY," +
-//         "name VARCHAR(255) NOT NULL" +
-//     ");";
-//     mysql.pool.query('DROP TABLE IF EXISTS Muscle_Groups', function(err){
-//         console.log('delete');
-//       if(err){
-//         next(err);
-//         return;
-//       }
-//         mysql.pool.query(createString, function(err){
-//             console.log('create');
-//             if(err){
-//                 next(err);
-//                 return;
-//             }
-//             mysql.pool.query("INSERT INTO Muscle_Groups (name)" +
-//                 "VALUES ('upper leg')," +
-//                 "('lower leg')," +
-//                 "('upper arms')," +
-//                 "('shoulders')," +
-//                 "('lower arms')," +
-//                 "('back')," +
-//                 "('abdominals');"
-//                 ,function(err){
-//                 mysql.pool.query('SELECT * FROM Muscle_Groups', function(err, rows, fields){
-//                     context.results = JSON.stringify(rows);
-//                     console.log("rows: ", context.results);
-//                 });
-//             });
-//         });
-//     });
-// });
