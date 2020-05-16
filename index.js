@@ -5,6 +5,7 @@ const env = require('dotenv').config();
 var cors = require('cors')
 
 const app = express();
+app.use(require("body-parser").json());
 
 //so we can make requests on local server
 app.use(cors())
@@ -100,6 +101,59 @@ app.get('/getWorkouts', async function(req,res,next){
         res.send(context);
     });
 });
+
+/*********************************************************
+/insertWorkout' handle:  
+Inserts a workout into the database
+Receives: nothing
+Returns: all rows from that table
+*********************************************************/
+app.post('/insertWorkout', function(req,res,error){
+
+    let queryText = "INSERT INTO Workouts (name, created_at, updated_at, user_id) " +
+    "VALUES (?, now(), now(), ?);"
+
+    let queryText2 = "INSERT INTO Workouts_Exercises (workout_id, exercise_id, sets, reps, exercise_order) " +
+        "VALUES ((select id from Workouts where name = ?), " + //workoutName
+        "?, " + //exerciseId
+        "?, ?, 1 " + //sets, reps, exerciseOrder
+        ")"
+
+    var query1 = {
+        text : queryText,
+        placeholder_arr : [req.body.workoutName, req.body.User],
+    };
+
+    var query2 = {
+        text : queryText2,
+        placeholder_arr : [req.body.workoutName, req.body.exerciseId, req.body.setCount, req.body.repCount],
+    };
+
+    parameterQuery(query1).then(parameterQuery(query2)).then(successCallback).catch(errorCallback);
+
+    function successCallback(result){
+        console.log('done',result);
+      }
+    function errorCallback(err){
+        console.log('Error while executing SQL Query',err);
+      }
+});
+
+function parameterQuery(query) {
+    return new Promise(function(resolve, reject) {
+        try {
+            mysql.pool.query(query.text, query.placeholder_arr, function(err, rows, fields) {
+                if (err) {
+                    return reject(err);
+                } else {
+                    return resolve(rows);
+                }
+            });
+        } catch (err) {
+            return reject(err);
+        }
+    })
+};
 
 /*********************************************************
 /getWorkoutsUsers handle:  

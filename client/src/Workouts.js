@@ -25,15 +25,28 @@ class Workouts extends Component {
       const submitData = {
         workoutName: event.target.elements.workoutName.value,
         User: event.target.elements.User.value,
-        exerciseName: event.target.elements.exerciseName.value,
+        exerciseId: event.target.elements.exerciseName.value,
         repCount: event.target.elements.repCount.value,
         setCount: event.target.elements.setCount.value,
       };
+
+      console.log(submitData);
       
-      // fetch('/api/form-submit-url', {
-      //   method: 'POST',
-      //   body: data,
-      // });
+      fetch('/insertWorkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(submitData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
     }
 
     componentDidMount() {
