@@ -7,17 +7,19 @@ import style from './style';
  
 class Workouts extends Component {
 
-    state = {
+    constructor() {
+      super();
+      this.state = {
         isLoading: true,
         data: [],
         users: [],
         exercises: [],
         error: null
-      }
-
-    constructor() {
-      super();
+      };
       this.handleSubmit = this.submitData.bind(this);
+
+      //need to bind "this" to submitData so it is able to update the state
+      this.submitData = this.submitData.bind(this);
     }
   
     submitData(event) {
@@ -29,8 +31,6 @@ class Workouts extends Component {
         repCount: event.target.elements.repCount.value,
         setCount: event.target.elements.setCount.value,
       };
-
-      console.log(submitData);
       
       fetch('/insertWorkout', {
         method: 'POST',
@@ -41,8 +41,8 @@ class Workouts extends Component {
         body: JSON.stringify(submitData)
       })
       .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
+      .then(newData => {
+        this.setState({data: newData});
       })
       .catch((error) => {
         console.error('Error:', error);

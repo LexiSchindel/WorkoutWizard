@@ -174,8 +174,39 @@ app.post('/insertWorkout', function(req,res,error){
         parameterQuery(query2)})
         .then(successCallback).catch(errorCallback);
 
-    function successCallback(result){
-        console.log('done',result);
+    function successCallback(){
+        let query = "select " +
+        "ww.id, " +
+        "ww.name as workout_name, " +
+        "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
+        "ee.name as exercise_name, " +
+        "we.sets, " +
+        "we.reps, " +
+        "we.exercise_order, " +
+        "mg.muscle_grps, " +
+        "COALESCE(tt.total_exercises,1) as total_exercises " +
+        
+        "from workouts ww " +
+        "left join workouts_exercises we on we.workout_id = ww.id " +
+        "left join users uu on uu.id = ww.user_id " +
+        "left join exercises ee on ee.id = we.exercise_id " +
+        "left join (select workout_id, count(*) as total_exercises "  +
+        "from workouts_exercises " +
+        "group by 1) tt on tt.workout_id = ww.id " +
+        "left join (select emg.exercise_id, GROUP_CONCAT(DISTINCT mg.name SEPARATOR ', ') as muscle_grps " +
+        "from exercises_musclegroups emg " +
+        "left join muscle_groups mg on mg.id = emg.musclegrp_id " +
+        "group by 1 " +
+        ") mg on mg.exercise_id = we.exercise_id " +
+        
+        "order by ww.id, we.exercise_order" +
+        ";";
+
+        //execute the query and the send the results back to the client
+        executeQuery(query, function(context){
+            // console.log("context", context);
+            res.send(context);
+        });
       }
     function errorCallback(err){
         console.log('Error while executing SQL Query',err);
