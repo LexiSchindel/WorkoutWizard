@@ -21,7 +21,16 @@ class Workouts extends Component {
       //need to bind "this" to submitData so it is able to update the state
       this.submitData = this.submitData.bind(this);
     }
-  
+
+    /************************************************
+     * submitData:
+     * gets data from the form fields, then submits
+     * using fetch. Will update the state to rerender
+     * the page with the updated data. 
+     * 
+     * Post request should return new "data" to update
+     * state with
+    ************************************************/
     submitData(event) {
       event.preventDefault();
       const submitData = {
