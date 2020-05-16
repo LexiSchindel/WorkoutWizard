@@ -158,7 +158,7 @@ app.post('/insertWorkout', function(req,res,error){
         "VALUES (?, " + //workoutId from the insert id returned by insert query
         "?, " + //exerciseId
         "?, ?, 1 " + //sets, reps, exerciseOrder
-        ")"
+        ");"
 
     var query1 = {
         text : queryText,
@@ -205,6 +205,42 @@ app.post('/insertWorkout', function(req,res,error){
         //execute the query and the send the results back to the client
         executeQuery(query, function(context){
             // console.log("context", context);
+            res.send(context);
+        });
+      }
+    function errorCallback(err){
+        console.log('Error while executing SQL Query',err);
+      }
+});
+
+app.post('/insertExercise', function(req,res,error){
+
+    let queryText = "INSERT INTO Exercises (name) " +
+        "VALUES (?);" //exerciseName
+
+    let queryText2 = "INSERT INTO Exercises_MuscleGroups (exercise_id, musclegrp_id) " +
+        "VALUES (?, " + //exerciseId
+	    "?);" //muscleId
+
+    var query1 = {
+        text : queryText,
+        placeholder_arr : [req.body.exerciseName],
+    };
+
+    parameterQuery(query1)
+    .then((row) => {
+        var query2 = {
+            text : queryText2,
+            placeholder_arr : [row.insertId, req.body.muscleGrpId],
+        };
+        parameterQuery(query2)})
+        .then(successCallback).catch(errorCallback);
+
+    function successCallback(){
+        let query = "SELECT * FROM Exercises;";
+
+        //execute the query and the send the results back to the client
+        executeQuery(query, function(context){
             res.send(context);
         });
       }

@@ -7,12 +7,52 @@ import style from './style';
  
 class Exercises extends Component {
 
-    state = {
-        isLoading: true,
-        data: [],
-        muscleGroups: [],
-        error: null
-      }
+    constructor() {
+        super();
+        this.state = {
+            isLoading: true,
+            data: [],
+            muscleGroups: [],
+            error: null
+        };
+        this.handleSubmit = this.submitData.bind(this);
+
+        //need to bind "this" to submitData so it is able to update the state
+        this.submitData = this.submitData.bind(this);
+    }
+
+    /************************************************
+     * submitData:
+     * gets data from the form fields, then submits
+     * using fetch. Will update the state to rerender
+     * the page with the updated data. 
+     * 
+     * Post request should return new "data" to update
+     * state with
+    ************************************************/
+   submitData(event) {
+        event.preventDefault();
+        const submitData = {
+            exerciseName: event.target.elements.formExercise.value,
+            muscleGrpId: event.target.elements.formMuscleGroup.value
+        };
+        
+        fetch('/insertExercise', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(submitData)
+        })
+        .then(response => response.json())
+        .then(newData => {
+        this.setState({data: newData});
+        })
+        .catch((error) => {
+        console.error('Error:', error);
+        });
+    }
 
     componentDidMount() {
         // Simple GET request using fetch
@@ -63,7 +103,7 @@ class Exercises extends Component {
             <Row>
                 <Col>
                 <div style={style.inputForm}>
-                    <Form>
+                    <Form onSubmit={this.submitData}>
                         <Form.Label>Add Exercise</Form.Label>
                         
                         <Form.Row>
@@ -84,7 +124,7 @@ class Exercises extends Component {
                                 {muscleGroups.map(muscleGroups => {
                                 const { id, name } = muscleGroups;
                                 return (
-                                    <option key={id}>{name}</option>
+                                    <option key={id} value={id}>{name}</option>
                                 );
                                 })}
 
