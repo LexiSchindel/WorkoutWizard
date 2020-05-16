@@ -15,6 +15,40 @@ class Workouts extends Component {
         error: null
       }
 
+    constructor() {
+      super();
+      this.handleSubmit = this.submitData.bind(this);
+    }
+  
+    submitData(event) {
+      event.preventDefault();
+      const submitData = {
+        workoutName: event.target.elements.workoutName.value,
+        User: event.target.elements.User.value,
+        exerciseId: event.target.elements.exerciseName.value,
+        repCount: event.target.elements.repCount.value,
+        setCount: event.target.elements.setCount.value,
+      };
+
+      console.log(submitData);
+      
+      fetch('/insertWorkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(submitData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+    }
+
     componentDidMount() {
         // Simple GET request using fetch
         fetch('/getWorkoutsUsers')
@@ -88,23 +122,23 @@ class Workouts extends Component {
             <Row>
                 <Col>
                 <div style={style.inputForm}>
-                <Form>
+                <Form onSubmit={this.submitData}>
                   <Form.Row>
                   <Form.Group as={Col} controlId="workoutName">
                     <Form.Label>Workout</Form.Label>
-                    <Form.Control />
+                    <Form.Control required type="text"/>
                   </Form.Group>
 
                   <Form.Group as={Col} controlId="User">
                     <Form.Label>Workout Author</Form.Label>
-                    <Form.Control as="select" placeholder="Search...">
-                      <option>Choose...</option>
+                    <Form.Control required as="select" placeholder="Search...">
+                      <option></option>
 
                       {/* Loops through user names to populate form dropdown */}
                       {users.map(users => {
                         const { id, user_name } = users;
                         return (
-                          <option key={id}>{user_name}</option>
+                          <option key={id} value={id}>{user_name}</option>
                         );
                         })}
 
@@ -115,14 +149,14 @@ class Workouts extends Component {
                   <Form.Row>
                   <Form.Group as={Col} controlId="exerciseName">
                     <Form.Label>Exercise</Form.Label>
-                    <Form.Control as="select" placeholder="Search...">
-                      <option>Choose...</option>
+                    <Form.Control required as="select" placeholder="Search...">
+                      <option></option>
 
                       {/* Loops through user names to populate form dropdown */}
                       {exercises.map(exercises => {
                         const { id, name } = exercises;
                         return (
-                          <option key={id}>{name}</option>
+                          <option key={id} value={id}>{name}</option>
                         );
                         })}
 
@@ -131,12 +165,12 @@ class Workouts extends Component {
 
                   <Form.Group as={Col} controlId="repCount">
                     <Form.Label>Reps</Form.Label>
-                    <Form.Control />
+                    <Form.Control required type="number"/>
                   </Form.Group>
 
                   <Form.Group as={Col} controlId="setCount">
                     <Form.Label>Sets</Form.Label>
-                    <Form.Control />
+                    <Form.Control required type="number"/>
                   </Form.Group>
                   </Form.Row>
 
