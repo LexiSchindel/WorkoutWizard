@@ -109,6 +109,7 @@ function errorCallback(){
 /*********************************************************
 Queries
 *********************************************************/  
+//used for Workouts page to display basic workout info and total exercises
 workoutUsers = 
 "select " +
   "ww.id, " +
@@ -125,6 +126,7 @@ workoutUsers =
   "order by ww.id" +
   ";";
 
+//used for Workouts Exercises and Home pages to display detailed workout info
   workoutSummary = 
   "select " +
     "ww.id, " +

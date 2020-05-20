@@ -56,6 +56,13 @@ class Workouts extends Component {
       .catch((error) => {
         console.error('Error:', error);
       });
+
+      //reset form values
+      event.target.elements.workoutName.value = "";
+      event.target.elements.User.placholder = "";
+      event.target.elements.exerciseName.placholder = "";
+      event.target.elements.repCount.value = "";
+      event.target.elements.setCount.value = "";
     }
 
     componentDidMount() {
@@ -140,7 +147,7 @@ class Workouts extends Component {
 
                   <Form.Group as={Col} controlId="User">
                     <Form.Label>Workout Author</Form.Label>
-                    <Form.Control required as="select" placeholder="Search...">
+                    <Form.Control required as="select" placeholder="Select User...">
                       <option></option>
 
                       {/* Loops through user names to populate form dropdown */}
@@ -158,7 +165,7 @@ class Workouts extends Component {
                   <Form.Row>
                   <Form.Group as={Col} controlId="exerciseName">
                     <Form.Label>Exercise</Form.Label>
-                    <Form.Control required as="select" placeholder="Search...">
+                    <Form.Control required as="select" placeholder="Select Exercise...">
                       <option></option>
 
                       {/* Loops through user names to populate form dropdown */}
