@@ -271,8 +271,8 @@ app.post('/insertWorkoutExercise', function(req,res,error){
         {
             let i = max;
             /*
-            * Asynchronously decrementing a variable
-            * The stylish route.
+            * Iterate through max -> exerciseOrder and adjust
+            * exercise_order up for each item for workout_id
             */
             promiseWhile(function(){
                 return i >= req.body.exerciseOrder;
@@ -297,7 +297,7 @@ app.post('/insertWorkoutExercise', function(req,res,error){
                 .then(successCallback).catch(errorCallback);
             });
         }
-        //otherwise just add on to the end
+        //otherwise just add on new exercise to the end
         else 
         {
             let addEndQuery = {
