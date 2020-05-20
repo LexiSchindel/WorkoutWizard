@@ -213,7 +213,20 @@ app.post('/insertWorkout', function(req,res,error){
       }
 });
 
+/*********************************************************
+/insertExercise' handle:  
+Inserts a exercise into the database
+Receives: nothing
+Returns: all rows from that table
+*********************************************************/
 app.post('/insertExercise', function(req,res,error){
+
+    let checkQuery = "SELECT id FROM Exercises WHERE lower(name) = lower(?);"
+
+    let check1 = {
+        text: checkQuery,
+        placeholder_arr: [req.body.exerciseName], 
+    };
 
     let queryText = "INSERT INTO Exercises (name) " +
         "VALUES (?);" //exerciseName
@@ -222,19 +235,26 @@ app.post('/insertExercise', function(req,res,error){
         "VALUES (?, " + //exerciseId
 	    "?);" //muscleId
 
-    var query1 = {
+    let query1 = {
         text : queryText,
         placeholder_arr : [req.body.exerciseName],
     };
-
-    parameterQuery(query1)
-    .then((row) => {
-        var query2 = {
-            text : queryText2,
-            placeholder_arr : [row.insertId, req.body.muscleGrpId],
-        };
-        parameterQuery(query2)})
-        .then(successCallback).catch(errorCallback);
+    
+    //check if we already have name in database, if so don't add again
+    parameterQuery(check1)
+    .then((response) => {
+        if (response.length == 0){
+            parameterQuery(query1)
+            .then((row) => {
+                var query2 = {
+                    text : queryText2,
+                    placeholder_arr : [row.insertId, req.body.muscleGrpId],
+                };
+                parameterQuery(query2)})
+                .then(successCallback).catch(errorCallback);
+        }
+    })
+    
 
     function successCallback(){
         let query = "SELECT * FROM Exercises;";
