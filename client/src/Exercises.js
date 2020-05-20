@@ -13,7 +13,8 @@ class Exercises extends Component {
             isLoading: true,
             data: [],
             muscleGroups: [],
-            error: null
+            error: null,
+            errorMessage: ''
         };
         this.handleSubmit = this.submitData.bind(this);
 
@@ -48,12 +49,18 @@ class Exercises extends Component {
         .then(response => response.json())
         .then(newData => {
             if (newData.failure === undefined){
-                this.setState({data: newData});
-                }
-            })
-            .catch((error) => {
-            console.error('Error:', error);
-            });
+                this.setState({
+                    data: newData,
+                    errorMessage: '',
+                });
+            }
+            else {
+                this.setState({errorMessage: "You cannot submit an exercise that already exists!"});
+            }
+        })
+        .catch((error) => {
+        console.error('Error:', error);
+        });
         }
 
     componentDidMount() {
@@ -142,6 +149,14 @@ class Exercises extends Component {
                     </Form>
                 </div>
                 </Col>
+            </Row>
+
+            <Row>
+                <div>
+                    { this.state.errorMessage &&
+                        <p className="error"> { this.state.errorMessage } </p> 
+                    }
+                </div>
             </Row>
             <br />
             <br />
