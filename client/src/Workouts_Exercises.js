@@ -56,6 +56,13 @@ class Exercises extends Component {
         .catch((error) => {
         console.error('Error:', error);
         });
+
+        //reset the form values
+        event.target.elements.formExercise.value = '';
+        event.target.elements.formWorkout.value = '';
+        event.target.elements.repCount.value = '';
+        event.target.elements.setCount.value = '';
+        event.target.elements.exerciseOrder.value = '';
     }
 
     componentDidMount() {
@@ -139,7 +146,7 @@ class Exercises extends Component {
                         <Form.Group as={Col} controlId="formWorkout">
                             {/* <Form.Label>Workout Author</Form.Label> */}
                             <Form.Control as="select" placeholder="Search..." required>
-                                <option>Select Workout...</option>
+                                <option></option>
 
                                 {/* Loops through user names to populate form dropdown */}
                                 {workouts.map(workouts => {
@@ -155,7 +162,7 @@ class Exercises extends Component {
                         <Form.Group as={Col} controlId="formExercise">
                             {/* <Form.Label>Workout Author</Form.Label> */}
                             <Form.Control as="select" placeholder="Search..." required>
-                                <option>Select Exercise...</option>
+                                <option></option>
 
                                 {/* Loops through user names to populate form dropdown */}
                                 {exercises.map(exercises => {

@@ -61,6 +61,9 @@ class Exercises extends Component {
         .catch((error) => {
         console.error('Error:', error);
         });
+
+        event.target.elements.formExercise.value = '';
+        event.target.elements.formMuscleGroup.value = '';
         }
 
     componentDidMount() {
@@ -127,7 +130,7 @@ class Exercises extends Component {
                         <Form.Group as={Col} controlId="formMuscleGroup">
                             {/* <Form.Label>Workout Author</Form.Label> */}
                             <Form.Control as="select" placeholder="Search..." required>
-                                <option>Select Muscle Group...</option>
+                                <option></option>
 
                                 {/* Loops through user names to populate form dropdown */}
                                 {muscleGroups.map(muscleGroups => {
