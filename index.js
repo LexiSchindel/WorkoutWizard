@@ -107,6 +107,53 @@ function errorCallback(){
   }
 
 /*********************************************************
+Queries
+*********************************************************/  
+workoutUsers = 
+"select " +
+  "ww.id, " +
+  "ww.name as workout_name, " +
+  "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
+  "COUNT(distinct we.id) as total_exercises " +
+  
+  "from workouts ww " +
+  "left join workouts_exercises we on we.workout_id = ww.id " +
+  "left join users uu on uu.id = ww.user_id " +
+
+  "group by 1,2,3 " +
+  
+  "order by ww.id" +
+  ";";
+
+  workoutSummary = 
+  "select " +
+    "ww.id, " +
+    "ww.name as workout_name, " +
+    "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
+    "ee.name as exercise_name, " +
+    "we.sets, " +
+    "we.reps, " +
+    "we.exercise_order, " +
+    "mg.muscle_grps, " +
+    "COALESCE(tt.total_exercises,1) as total_exercises " +
+    
+    "from workouts ww " +
+    "left join workouts_exercises we on we.workout_id = ww.id " +
+    "left join users uu on uu.id = ww.user_id " +
+    "left join exercises ee on ee.id = we.exercise_id " +
+    "left join (select workout_id, count(*) as total_exercises "  +
+    "from workouts_exercises " +
+    "group by 1) tt on tt.workout_id = ww.id " +
+    "left join (select emg.exercise_id, GROUP_CONCAT(DISTINCT mg.name SEPARATOR ', ') as muscle_grps " +
+	"from exercises_musclegroups emg " +
+	"left join muscle_groups mg on mg.id = emg.musclegrp_id " +
+    "group by 1 " +
+    ") mg on mg.exercise_id = we.exercise_id " +
+    
+    "order by ww.id, we.exercise_order" +
+    ";";
+
+/*********************************************************
 /getTable handle:  
 Grabs all the data from the table (based on the passed
 table name from the query string) and returns to the client.
@@ -159,37 +206,8 @@ Returns: all rows from that table
 *********************************************************/
 app.get('/getWorkouts', async function(req,res,next){
 
-    //query returns workout id, workout name, user name, exercise names,
-    //sets, reps, exercise order, and the total # of exercises in workout
-    let query = "select " +
-    "ww.id, " +
-    "ww.name as workout_name, " +
-    "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
-    "ee.name as exercise_name, " +
-    "we.sets, " +
-    "we.reps, " +
-    "we.exercise_order, " +
-    "mg.muscle_grps, " +
-    "COALESCE(tt.total_exercises,1) as total_exercises " +
-    
-    "from workouts ww " +
-    "left join workouts_exercises we on we.workout_id = ww.id " +
-    "left join users uu on uu.id = ww.user_id " +
-    "left join exercises ee on ee.id = we.exercise_id " +
-    "left join (select workout_id, count(*) as total_exercises "  +
-    "from workouts_exercises " +
-    "group by 1) tt on tt.workout_id = ww.id " +
-    "left join (select emg.exercise_id, GROUP_CONCAT(DISTINCT mg.name SEPARATOR ', ') as muscle_grps " +
-	"from exercises_musclegroups emg " +
-	"left join muscle_groups mg on mg.id = emg.musclegrp_id " +
-    "group by 1 " +
-    ") mg on mg.exercise_id = we.exercise_id " +
-    
-    "order by ww.id, we.exercise_order" +
-    ";";
-
     //execute the query and the send the results back to the client
-    executeQuery(query, function(context){
+    executeQuery(workoutSummary, function(context){
         // console.log("context", context);
         res.send(context);
     });
@@ -217,21 +235,6 @@ app.post('/insertWorkout', function(req,res,error){
         placeholder_arr : [req.body.workoutName, req.body.User],
     };
 
-    let successQuery = "select " +
-    "ww.id, " +
-    "ww.name as workout_name, " +
-    "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
-    "COUNT(distinct we.id) as total_exercises " +
-    
-    "from workouts ww " +
-    "left join workouts_exercises we on we.workout_id = ww.id " +
-    "left join users uu on uu.id = ww.user_id " +
-
-    "group by 1,2,3 " +
-    
-    "order by ww.id" +
-    ";";
-
     parameterQuery(query1)
     .then((row) => {
         var query2 = {
@@ -239,7 +242,7 @@ app.post('/insertWorkout', function(req,res,error){
             placeholder_arr : [row.insertId, req.body.exerciseId, req.body.setCount, req.body.repCount],
         };
         parameterQuery(query2)})
-        .then(successCallback(successQuery, res)).catch(errorCallback);
+        .then(() => successCallback(workoutUsers, res)).catch(errorCallback);
 });
 
 /*********************************************************
@@ -261,34 +264,7 @@ app.post('/insertWorkoutExercise', function(req,res,error){
     "VALUES (?, " + //workoutId from the insert id returned by insert query
     "?, " + //exerciseId
     "?, ?, ? " + //reps, sets, exerciseOrder
-    ");"
-
-    let successQuery = "select " +
-        "ww.id, " +
-        "ww.name as workout_name, " +
-        "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
-        "ee.name as exercise_name, " +
-        "we.sets, " +
-        "we.reps, " +
-        "we.exercise_order, " +
-        "mg.muscle_grps, " +
-        "COALESCE(tt.total_exercises,1) as total_exercises " +
-        
-        "from workouts ww " +
-        "left join workouts_exercises we on we.workout_id = ww.id " +
-        "left join users uu on uu.id = ww.user_id " +
-        "left join exercises ee on ee.id = we.exercise_id " +
-        "left join (select workout_id, count(*) as total_exercises "  +
-        "from workouts_exercises " +
-        "group by 1) tt on tt.workout_id = ww.id " +
-        "left join (select emg.exercise_id, GROUP_CONCAT(DISTINCT mg.name SEPARATOR ', ') as muscle_grps " +
-        "from exercises_musclegroups emg " +
-        "left join muscle_groups mg on mg.id = emg.musclegrp_id " +
-        "group by 1 " +
-        ") mg on mg.exercise_id = we.exercise_id " +
-        
-        "order by ww.id, we.exercise_order" +
-        ";";
+    ");";
 
     let maxQuery = {
         text: maxOrderQuery,
@@ -328,8 +304,8 @@ app.post('/insertWorkoutExercise', function(req,res,error){
                         req.body.repCount, req.body.setCount, req.body.exerciseOrder],
                 };
                 parameterQuery(insertQuery)
-                .then(function(){
-                    successCallback(successQuery, res)})
+                .then(() => {
+                    successCallback(workoutSummary, res)})
                 .catch(errorCallback);
             });
         }
@@ -342,7 +318,7 @@ app.post('/insertWorkoutExercise', function(req,res,error){
                     req.body.repCount, req.body.setCount, max + 1],
             };
             parameterQuery(addEndQuery)
-            .then(successCallback(successQuery, res)).catch(errorCallback);
+            .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
         }
     })
 });
@@ -387,7 +363,7 @@ app.post('/insertExercise', function(req,res,error){
                     placeholder_arr : [row.insertId, req.body.muscleGrpId],
                 };
                 parameterQuery(query2)})
-                .then(successCallback(successQuery, res)).catch(errorCallback);
+                .then(() => successCallback(successQuery, res)).catch(errorCallback);
         }
         else {
             res.send(JSON.stringify(
@@ -410,23 +386,9 @@ app.get('/getWorkoutsUsers', async function(req,res,next){
 
     //query returns workout id, workout name, user name, exercise names,
     //sets, reps, exercise order, and the total # of exercises in workout
-    let query = "select " +
-    "ww.id, " +
-    "ww.name as workout_name, " +
-    "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
-    "COUNT(distinct we.id) as total_exercises " +
-    
-    "from workouts ww " +
-    "left join workouts_exercises we on we.workout_id = ww.id " +
-    "left join users uu on uu.id = ww.user_id " +
-
-    "group by 1,2,3 " +
-    
-    "order by ww.id" +
-    ";";
 
     //execute the query and the send the results back to the client
-    executeQuery(query, function(context){
+    executeQuery(workoutUsers, function(context){
         res.send(context);
     });
 });
