@@ -237,13 +237,16 @@ app.post('/insertWorkout', function(req,res,error){
         placeholder_arr : [req.body.workoutName, req.body.User],
     };
 
+    //Insert new workout into Workouts
     parameterQuery(query1)
+    //Then insert the submitted exercise into Workouts_Exercises
     .then((row) => {
         var query2 = {
             text : queryText2,
             placeholder_arr : [row.insertId, req.body.exerciseId, req.body.setCount, req.body.repCount],
         };
         parameterQuery(query2)})
+        //then get updated data to return back as the post response
         .then(() => successCallback(workoutUsers, res)).catch(errorCallback);
 });
 
@@ -299,13 +302,15 @@ app.post('/insertWorkoutExercise', function(req,res,error){
                         resolve(parameterQuery(incOrderNum));
                     },200);
                 });
-            }).then(function(){
+            }).then(() => {
                 let insertQuery = {
                     text: queryText2,
                     placeholder_arr: [req.body.workoutId, req.body.exerciseId, 
                         req.body.repCount, req.body.setCount, req.body.exerciseOrder],
                 };
+                //after we've incremented to make space, insert the new exercise
                 parameterQuery(insertQuery)
+                //finally get refreshed data and send it back as the post response  
                 .then(() => {
                     successCallback(workoutSummary, res)})
                 .catch(errorCallback);
@@ -326,7 +331,7 @@ app.post('/insertWorkoutExercise', function(req,res,error){
 });
 
 /*********************************************************
-/insertExercise' handle:  
+/insertExercise handle:  
 Inserts a exercise into the database
 Receives: nothing
 Returns: all rows from that table
@@ -357,16 +362,20 @@ app.post('/insertExercise', function(req,res,error){
     //check if we already have name in database, if so don't add again
     parameterQuery(check1)
     .then((response) => {
+        //if we do not have the data, then response.length == 0 so insert
         if (response.length == 0){
+            //insert into Exercises
             parameterQuery(query1)
             .then((row) => {
                 var query2 = {
                     text : queryText2,
                     placeholder_arr : [row.insertId, req.body.muscleGrpId],
                 };
+                //insert into Exercises_MuscleGroups
                 parameterQuery(query2)})
                 .then(() => successCallback(successQuery, res)).catch(errorCallback);
         }
+        //otherwise don't insert the data and return back a failure
         else {
             res.send(JSON.stringify(
                 {
