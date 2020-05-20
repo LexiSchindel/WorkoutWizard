@@ -7,13 +7,56 @@ import style from './style';
  
 class Exercises extends Component {
 
-    state = {
-        isLoading: true,
-        workouts: [],
-        exercises: [],
-        data: [],
-        error: null
-      }
+    constructor() {
+        super();
+        this.state = {
+            isLoading: true,
+            workouts: [],
+            exercises: [],
+            data: [],
+            error: null
+          }
+
+        this.handleSubmit = this.submitData.bind(this);
+
+        //need to bind "this" to submitData so it is able to update the state
+        this.submitData = this.submitData.bind(this); 
+    }
+    
+    submitData(event) {
+        event.preventDefault();
+        const submitData = {
+            exerciseId: event.target.elements.formExercise.value,
+            workoutId: event.target.elements.formWorkout.value,
+            repCount: event.target.elements.repCount.value,
+            setCount: event.target.elements.setCount.value,
+            exerciseOrder: event.target.elements.exerciseOrder.value
+        };
+        
+        fetch('/insertWorkoutExercise', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(submitData)
+        })
+        .then(response => response.json())
+        .then(newData => {
+            if (newData.failure === undefined){
+                this.setState({
+                    data: newData,
+                    errorMessage: '',
+                });
+            }
+            else {
+                this.setState({errorMessage: "You cannot submit an exercise that already exists!"});
+            }
+        })
+        .catch((error) => {
+        console.error('Error:', error);
+        });
+    }
 
     componentDidMount() {
         // Simple GET request using fetch
@@ -38,7 +81,7 @@ class Exercises extends Component {
           .then(workouts =>
             this.setState({
                 workouts: workouts,
-              isLoading: false,
+                isLoading: false,
             })
           )
         // Catch any errors we hit and update the app
@@ -52,7 +95,7 @@ class Exercises extends Component {
            .then(exercises =>
              this.setState({
                 exercises: exercises,
-               isLoading: false,
+                isLoading: false,
              })
            )
          // Catch any errors we hit and update the app
@@ -88,7 +131,7 @@ class Exercises extends Component {
             <Row>
                 <Col>
                 <div style={style.inputForm}>
-                    <Form>
+                    <Form onSubmit={this.submitData}>
                         <Form.Label>Add Exercise to Workout</Form.Label>
                         
                         <Form.Row>
@@ -102,7 +145,7 @@ class Exercises extends Component {
                                 {workouts.map(workouts => {
                                 const { id, name } = workouts;
                                 return (
-                                    <option key={id}>{name}</option>
+                                    <option key={id} value={id}>{name}</option>
                                 );
                                 })}
 
@@ -118,7 +161,7 @@ class Exercises extends Component {
                                 {exercises.map(exercises => {
                                 const { id, name } = exercises;
                                 return (
-                                    <option key={id}>{name}</option>
+                                    <option key={id} value={id}>{name}</option>
                                 );
                                 })}
 

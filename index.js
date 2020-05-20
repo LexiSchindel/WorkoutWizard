@@ -5,6 +5,7 @@ const env = require('dotenv').config();
 var cors = require('cors')
 
 const app = express();
+const RSVP = require('rsvp');
 app.use(require("body-parser").json());
 
 //so we can make requests on local server
@@ -51,6 +52,27 @@ function executeQuery(query, callback){
         }
         // console.log("row: ", rows);
         callback(rows);
+    });
+}
+
+//Promise Loop
+function promiseWhile(condition, body) {
+    return new RSVP.Promise(function(resolve,reject){
+    
+        function loop() {
+            RSVP.Promise.resolve(condition()).then(function(result){
+                // When the result of calling `condition` is no longer true, we are done.
+                if (!result){
+                    resolve();
+                } else {
+                    // When it completes loop again otherwise, if it fails, reject
+                    RSVP.Promise.resolve(body()).then(loop,reject);
+                }
+            });
+        }
+    
+        // Start running the loop
+        loop();
     });
 }
 
@@ -214,6 +236,120 @@ app.post('/insertWorkout', function(req,res,error){
 });
 
 /*********************************************************
+/insertWorkoutExercise' handle:  
+Inserts an exercise into an existing workout. Will update
+exercise order appropriately
+Receives: nothing
+Returns: all rows from that table
+*********************************************************/
+app.post('/insertWorkoutExercise', function(req,res,error){
+
+    let maxOrderQuery = "SELECT max(exercise_order) as max FROM Workouts_Exercises " +
+        "WHERE workout_id = ?";
+
+    let queryText = "UPDATE Workouts_Exercises SET exercise_order = ? " +
+    "WHERE workout_id = ? AND exercise_order = ?;";
+
+    let queryText2 = "INSERT INTO Workouts_Exercises (workout_id, exercise_id, reps, sets, exercise_order) " +
+    "VALUES (?, " + //workoutId from the insert id returned by insert query
+    "?, " + //exerciseId
+    "?, ?, ? " + //reps, sets, exerciseOrder
+    ");"
+
+    let maxQuery = {
+        text: maxOrderQuery,
+        placeholder_arr: [req.body.workoutId]
+    };
+
+    parameterQuery(maxQuery)
+    .then((row) => {
+        let max = row[0].max;
+
+        //if this is inserted into middle of current workout order
+        //then increment all exerciseOrder above
+        if (req.body.exerciseOrder <= max)
+        {
+            let i = max;
+            /*
+            * Asynchronously decrementing a variable
+            * The stylish route.
+            */
+            promiseWhile(function(){
+                return i >= req.body.exerciseOrder;
+            },function(){
+                return new RSVP.Promise(function(resolve, reject){
+                    setTimeout(function(){
+                        let incOrderNum = {
+                            text: queryText,
+                            placeholder_arr: [i+1, req.body.workoutId, i],
+                        };
+                        i--;
+                        resolve(parameterQuery(incOrderNum));
+                    },200);
+                });
+            }).then(function(){
+                let insertQuery = {
+                    text: queryText2,
+                    placeholder_arr: [req.body.workoutId, req.body.exerciseId, 
+                        req.body.repCount, req.body.setCount, req.body.exerciseOrder],
+                };
+                parameterQuery(insertQuery)
+                .then(successCallback).catch(errorCallback);
+            });
+        }
+        //otherwise just add on to the end
+        else 
+        {
+            let addEndQuery = {
+                text: queryText2,
+                placeholder_arr: [req.body.workoutId, req.body.exerciseId, 
+                    req.body.repCount, req.body.setCount, max + 1],
+            };
+            parameterQuery(addEndQuery)
+            .then(successCallback).catch(errorCallback);
+        }
+    })
+
+    function successCallback(){
+        let query = "select " +
+        "ww.id, " +
+        "ww.name as workout_name, " +
+        "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
+        "ee.name as exercise_name, " +
+        "we.sets, " +
+        "we.reps, " +
+        "we.exercise_order, " +
+        "mg.muscle_grps, " +
+        "COALESCE(tt.total_exercises,1) as total_exercises " +
+        
+        "from workouts ww " +
+        "left join workouts_exercises we on we.workout_id = ww.id " +
+        "left join users uu on uu.id = ww.user_id " +
+        "left join exercises ee on ee.id = we.exercise_id " +
+        "left join (select workout_id, count(*) as total_exercises "  +
+        "from workouts_exercises " +
+        "group by 1) tt on tt.workout_id = ww.id " +
+        "left join (select emg.exercise_id, GROUP_CONCAT(DISTINCT mg.name SEPARATOR ', ') as muscle_grps " +
+        "from exercises_musclegroups emg " +
+        "left join muscle_groups mg on mg.id = emg.musclegrp_id " +
+        "group by 1 " +
+        ") mg on mg.exercise_id = we.exercise_id " +
+        
+        "order by ww.id, we.exercise_order" +
+        ";";
+
+        //execute the query and the send the results back to the client
+        executeQuery(query, function(context){
+            // console.log("context", context);
+            res.send(context);
+        });
+      }
+    function errorCallback(err){
+        console.log('Error while executing SQL Query',err);
+      }
+});
+
+/*********************************************************
 /insertExercise' handle:  
 Inserts a exercise into the database
 Receives: nothing
@@ -221,7 +357,7 @@ Returns: all rows from that table
 *********************************************************/
 app.post('/insertExercise', function(req,res,error){
 
-    let checkQuery = "SELECT id FROM Exercises WHERE lower(name) = lower(?);"
+    let checkQuery = "SELECT id FROM Exercises WHERE lower(name) = lower(?);";
 
     let check1 = {
         text: checkQuery,
@@ -229,11 +365,11 @@ app.post('/insertExercise', function(req,res,error){
     };
 
     let queryText = "INSERT INTO Exercises (name) " +
-        "VALUES (?);" //exerciseName
+        "VALUES (?);"; //exerciseName
 
     let queryText2 = "INSERT INTO Exercises_MuscleGroups (exercise_id, musclegrp_id) " +
         "VALUES (?, " + //exerciseId
-	    "?);" //muscleId
+	    "?);"; //muscleId
 
     let query1 = {
         text : queryText,

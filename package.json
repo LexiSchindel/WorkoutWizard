@@ -27,7 +27,8 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mysql": "^2.18.1",
-    "password-generator": "^2.2.3"
+    "password-generator": "^2.2.3",
+    "rsvp": "^4.8.5"
   },
   "devDependencies": {
     "concurrently": "^5.1.0"
