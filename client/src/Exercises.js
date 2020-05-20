@@ -47,12 +47,14 @@ class Exercises extends Component {
         })
         .then(response => response.json())
         .then(newData => {
-        this.setState({data: newData});
-        })
-        .catch((error) => {
-        console.error('Error:', error);
-        });
-    }
+            if (newData.failure === undefined){
+                this.setState({data: newData});
+                }
+            })
+            .catch((error) => {
+            console.error('Error:', error);
+            });
+        }
 
     componentDidMount() {
         // Simple GET request using fetch

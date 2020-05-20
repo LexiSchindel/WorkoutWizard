@@ -253,6 +253,13 @@ app.post('/insertExercise', function(req,res,error){
                 parameterQuery(query2)})
                 .then(successCallback).catch(errorCallback);
         }
+        else {
+            res.send(JSON.stringify(
+                {
+                    failure: true,
+                }
+            ));
+        }
     })
     
 
