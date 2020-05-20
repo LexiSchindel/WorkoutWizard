@@ -55,7 +55,13 @@ function executeQuery(query, callback){
     });
 }
 
-//Promise Loop
+/*********************************************************
+promiseWhile: 
+Allows us to loop through queries sequentially
+Receives: condition that evaluates to true/false
+and body that should execute each While iteration
+Returns: sends rows back to repopulate table
+*********************************************************/
 function promiseWhile(condition, body) {
     return new RSVP.Promise(function(resolve,reject){
     
@@ -75,6 +81,30 @@ function promiseWhile(condition, body) {
         loop();
     });
 }
+
+/*********************************************************
+successCallback: 
+Executes when we have a successful insert/delete
+Receives: query text to execute (no parameters) and the res
+so we can send back context using res.send
+Returns: Nothin
+*********************************************************/
+function successCallback(query, res){
+    //execute the query and the send the results back to the client
+    executeQuery(query, function(context){
+        res.send(context);
+    });
+  }
+
+/*********************************************************
+errorCallback: 
+Executes when we have an error with our query
+Receives: Nothing
+Returns: Nothin
+*********************************************************/
+function errorCallback(){
+    console.log('Error while executing SQL Query');
+  }
 
 /*********************************************************
 /getTable handle:  
@@ -187,6 +217,21 @@ app.post('/insertWorkout', function(req,res,error){
         placeholder_arr : [req.body.workoutName, req.body.User],
     };
 
+    let successQuery = "select " +
+    "ww.id, " +
+    "ww.name as workout_name, " +
+    "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
+    "COUNT(distinct we.id) as total_exercises " +
+    
+    "from workouts ww " +
+    "left join workouts_exercises we on we.workout_id = ww.id " +
+    "left join users uu on uu.id = ww.user_id " +
+
+    "group by 1,2,3 " +
+    
+    "order by ww.id" +
+    ";";
+
     parameterQuery(query1)
     .then((row) => {
         var query2 = {
@@ -194,10 +239,31 @@ app.post('/insertWorkout', function(req,res,error){
             placeholder_arr : [row.insertId, req.body.exerciseId, req.body.setCount, req.body.repCount],
         };
         parameterQuery(query2)})
-        .then(successCallback).catch(errorCallback);
+        .then(successCallback(successQuery, res)).catch(errorCallback);
+});
 
-    function successCallback(){
-        let query = "select " +
+/*********************************************************
+/insertWorkoutExercise' handle:  
+Inserts an exercise into an existing workout. Will update
+exercise order appropriately
+Receives: nothing
+Returns: all rows from that table
+*********************************************************/
+app.post('/insertWorkoutExercise', function(req,res,error){
+
+    let maxOrderQuery = "SELECT max(exercise_order) as max FROM Workouts_Exercises " +
+        "WHERE workout_id = ?";
+
+    let queryText = "UPDATE Workouts_Exercises SET exercise_order = ? " +
+    "WHERE workout_id = ? AND exercise_order = ?;";
+
+    let queryText2 = "INSERT INTO Workouts_Exercises (workout_id, exercise_id, reps, sets, exercise_order) " +
+    "VALUES (?, " + //workoutId from the insert id returned by insert query
+    "?, " + //exerciseId
+    "?, ?, ? " + //reps, sets, exerciseOrder
+    ");"
+
+    let successQuery = "select " +
         "ww.id, " +
         "ww.name as workout_name, " +
         "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
@@ -223,38 +289,6 @@ app.post('/insertWorkout', function(req,res,error){
         
         "order by ww.id, we.exercise_order" +
         ";";
-
-        //execute the query and the send the results back to the client
-        executeQuery(query, function(context){
-            // console.log("context", context);
-            res.send(context);
-        });
-      }
-    function errorCallback(err){
-        console.log('Error while executing SQL Query',err);
-      }
-});
-
-/*********************************************************
-/insertWorkoutExercise' handle:  
-Inserts an exercise into an existing workout. Will update
-exercise order appropriately
-Receives: nothing
-Returns: all rows from that table
-*********************************************************/
-app.post('/insertWorkoutExercise', function(req,res,error){
-
-    let maxOrderQuery = "SELECT max(exercise_order) as max FROM Workouts_Exercises " +
-        "WHERE workout_id = ?";
-
-    let queryText = "UPDATE Workouts_Exercises SET exercise_order = ? " +
-    "WHERE workout_id = ? AND exercise_order = ?;";
-
-    let queryText2 = "INSERT INTO Workouts_Exercises (workout_id, exercise_id, reps, sets, exercise_order) " +
-    "VALUES (?, " + //workoutId from the insert id returned by insert query
-    "?, " + //exerciseId
-    "?, ?, ? " + //reps, sets, exerciseOrder
-    ");"
 
     let maxQuery = {
         text: maxOrderQuery,
@@ -294,7 +328,9 @@ app.post('/insertWorkoutExercise', function(req,res,error){
                         req.body.repCount, req.body.setCount, req.body.exerciseOrder],
                 };
                 parameterQuery(insertQuery)
-                .then(successCallback).catch(errorCallback);
+                .then(function(){
+                    successCallback(successQuery, res)})
+                .catch(errorCallback);
             });
         }
         //otherwise just add on new exercise to the end
@@ -306,47 +342,9 @@ app.post('/insertWorkoutExercise', function(req,res,error){
                     req.body.repCount, req.body.setCount, max + 1],
             };
             parameterQuery(addEndQuery)
-            .then(successCallback).catch(errorCallback);
+            .then(successCallback(successQuery, res)).catch(errorCallback);
         }
     })
-
-    function successCallback(){
-        let query = "select " +
-        "ww.id, " +
-        "ww.name as workout_name, " +
-        "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
-        "ee.name as exercise_name, " +
-        "we.sets, " +
-        "we.reps, " +
-        "we.exercise_order, " +
-        "mg.muscle_grps, " +
-        "COALESCE(tt.total_exercises,1) as total_exercises " +
-        
-        "from workouts ww " +
-        "left join workouts_exercises we on we.workout_id = ww.id " +
-        "left join users uu on uu.id = ww.user_id " +
-        "left join exercises ee on ee.id = we.exercise_id " +
-        "left join (select workout_id, count(*) as total_exercises "  +
-        "from workouts_exercises " +
-        "group by 1) tt on tt.workout_id = ww.id " +
-        "left join (select emg.exercise_id, GROUP_CONCAT(DISTINCT mg.name SEPARATOR ', ') as muscle_grps " +
-        "from exercises_musclegroups emg " +
-        "left join muscle_groups mg on mg.id = emg.musclegrp_id " +
-        "group by 1 " +
-        ") mg on mg.exercise_id = we.exercise_id " +
-        
-        "order by ww.id, we.exercise_order" +
-        ";";
-
-        //execute the query and the send the results back to the client
-        executeQuery(query, function(context){
-            // console.log("context", context);
-            res.send(context);
-        });
-      }
-    function errorCallback(err){
-        console.log('Error while executing SQL Query',err);
-      }
 });
 
 /*********************************************************
@@ -363,6 +361,8 @@ app.post('/insertExercise', function(req,res,error){
         text: checkQuery,
         placeholder_arr: [req.body.exerciseName], 
     };
+
+    let successQuery = "SELECT * FROM Exercises;";
 
     let queryText = "INSERT INTO Exercises (name) " +
         "VALUES (?);"; //exerciseName
@@ -387,7 +387,7 @@ app.post('/insertExercise', function(req,res,error){
                     placeholder_arr : [row.insertId, req.body.muscleGrpId],
                 };
                 parameterQuery(query2)})
-                .then(successCallback).catch(errorCallback);
+                .then(successCallback(successQuery, res)).catch(errorCallback);
         }
         else {
             res.send(JSON.stringify(
@@ -397,19 +397,6 @@ app.post('/insertExercise', function(req,res,error){
             ));
         }
     })
-    
-
-    function successCallback(){
-        let query = "SELECT * FROM Exercises;";
-
-        //execute the query and the send the results back to the client
-        executeQuery(query, function(context){
-            res.send(context);
-        });
-      }
-    function errorCallback(err){
-        console.log('Error while executing SQL Query',err);
-      }
 });
 
 /*********************************************************
