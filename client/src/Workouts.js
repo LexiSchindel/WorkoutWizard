@@ -50,7 +50,7 @@ class Workouts extends Component {
     };
 
     /************************************************
-     * submitData:
+     * submitHandle:
      * gets data from the form fields, then submits
      * using fetch. Will update the state to rerender
      * the page with the updated data. 

@@ -1,3 +1,9 @@
+/************************************************
+ * deleteData:
+ * Receives id to delete and a handle to then
+ * delete from database.
+ * Returns the newData to repopulate table with.
+************************************************/
 export async function deleteData(id, handle){
 
     //create url using handle and appending id

@@ -1,6 +1,11 @@
+/************************************************
+ * submitData:
+ * Receives data and a handle to then Post (insert)
+ * into database.
+ * Returns the newData to repopulate table with.
+************************************************/
 export async function submitData(data, handle){
 
-    //
     return fetch(handle, {
         method: 'POST',
         headers: {
