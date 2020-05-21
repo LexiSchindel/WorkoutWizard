@@ -130,6 +130,7 @@ workoutUsers =
   workoutSummary = 
   "select " +
     "ww.id, " +
+    "we.id as workout_exercise_id, " +
     "ww.name as workout_name, " +
     "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
     "ee.name as exercise_name, " +
@@ -224,13 +225,13 @@ Returns: all rows from that table
 app.post('/insertWorkout', function(req,res,error){
 
     let queryText = "INSERT INTO Workouts (name, created_at, updated_at, user_id) " +
-    "VALUES (?, now(), now(), ?);"
+    "VALUES (?, now(), now(), ?);";
 
     let queryText2 = "INSERT INTO Workouts_Exercises (workout_id, exercise_id, sets, reps, exercise_order) " +
         "VALUES (?, " + //workoutId from the insert id returned by insert query
         "?, " + //exerciseId
         "?, ?, 1 " + //sets, reps, exerciseOrder
-        ");"
+        ");";
 
     var query1 = {
         text : queryText,
@@ -245,6 +246,40 @@ app.post('/insertWorkout', function(req,res,error){
             text : queryText2,
             placeholder_arr : [row.insertId, req.body.exerciseId, req.body.setCount, req.body.repCount],
         };
+        parameterQuery(query2)})
+        //then get updated data to return back as the post response
+        .then(() => successCallback(workoutUsers, res)).catch(errorCallback);
+});
+
+/*********************************************************
+/deleteWorkout' handle:  
+Deletes a workout from the database
+Receives: id to delete (Workout.id 
+    and Workouts_Exercises.workout_id)
+Returns: all rows from that table
+*********************************************************/
+app.delete('/deleteWorkout/:id', function(req,res,error){
+
+    let id = parseInt(req.params.id);
+
+    let queryText = "DELETE FROM Workouts_Exercises WHERE workout_id = ?;";
+
+    let queryText2 = "DELETE FROM Workouts WHERE id = ?;";
+
+    var query1 = {
+        text : queryText,
+        placeholder_arr : [id],
+    };
+
+    var query2 = {
+        text : queryText2,
+        placeholder_arr : [id],
+    };
+
+    //Insert new workout into Workouts
+    parameterQuery(query1)
+    //Then insert the submitted exercise into Workouts_Exercises
+    .then(() => {
         parameterQuery(query2)})
         //then get updated data to return back as the post response
         .then(() => successCallback(workoutUsers, res)).catch(errorCallback);
@@ -302,13 +337,14 @@ app.post('/insertWorkoutExercise', function(req,res,error){
                         resolve(parameterQuery(incOrderNum));
                     },200);
                 });
-            }).then(() => {
+            })
+            //after we've incremented to make space, insert the new exercise
+            .then(() => {
                 let insertQuery = {
                     text: queryText2,
                     placeholder_arr: [req.body.workoutId, req.body.exerciseId, 
                         req.body.repCount, req.body.setCount, req.body.exerciseOrder],
                 };
-                //after we've incremented to make space, insert the new exercise
                 parameterQuery(insertQuery)
                 //finally get refreshed data and send it back as the post response  
                 .then(() => {
@@ -328,6 +364,30 @@ app.post('/insertWorkoutExercise', function(req,res,error){
             .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
         }
     })
+});
+
+/*********************************************************
+/deleteWorkoutExercise' handle:  
+Deletes exercise from a workout
+Receives: id to delete (Workouts_Exercises.id)
+Returns: all rows from that table
+*********************************************************/
+app.delete('/deleteWorkoutExercise/:id', function(req,res,error){
+
+    let id = parseInt(req.params.id);
+    console.log("here: ", id);
+
+    let queryText = "DELETE FROM Workouts_Exercises WHERE id = ?;";
+
+    var query1 = {
+        text : queryText,
+        placeholder_arr : id,
+    };
+
+    //Insert new workout into Workouts
+    parameterQuery(query1)
+    //Then insert the submitted exercise into Workouts_Exercises
+    .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
 });
 
 /*********************************************************
@@ -366,12 +426,12 @@ app.post('/insertExercise', function(req,res,error){
         if (response.length == 0){
             //insert into Exercises
             parameterQuery(query1)
+            //then insert into Exercises_MuscleGroups
             .then((row) => {
                 var query2 = {
                     text : queryText2,
                     placeholder_arr : [row.insertId, req.body.muscleGrpId],
                 };
-                //insert into Exercises_MuscleGroups
                 parameterQuery(query2)})
                 .then(() => successCallback(successQuery, res)).catch(errorCallback);
         }

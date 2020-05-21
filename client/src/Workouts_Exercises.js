@@ -4,6 +4,8 @@ import { Row, Container, Col } from 'react-bootstrap'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import style from './style';
+import { deleteData } from './deleteData';
+import { submitData } from './submitData';
  
 class Exercises extends Component {
 
@@ -17,53 +19,68 @@ class Exercises extends Component {
             error: null
           }
 
-        this.handleSubmit = this.submitData.bind(this);
-
-        //need to bind "this" to submitData so it is able to update the state
-        this.submitData = this.submitData.bind(this); 
+        this.submitHandle = this.submitHandle.bind(this);
+        this.deleteHandle = this.deleteHandle.bind(this); 
     }
+
+    /************************************************
+     * deleteHandle:
+     * Gets the workoutId to delete and passes it to the
+     * delete data function 
+     * 
+     * Delete request should return new "data" to update
+     * state with
+    ************************************************/
+   deleteHandle(event){
+    event.preventDefault();
+
+    let id = event.target.id;
+    let handle = '/deleteWorkoutExercise';
+
+    deleteData(id, handle)
+    .then(newData => {
+      this.setState({data: newData});
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+
+  };
+
+  /************************************************
+   * submitHandle:
+   * gets data from the form fields, then submits
+   * using fetch. Will update the state to rerender
+   * the page with the updated data. 
+   * 
+   * Post request should return new "data" to update
+   * state with
+  ************************************************/
+  submitHandle(event) {
+    event.preventDefault();
+    const data = {
+        exerciseId: event.target.elements.formExercise.value,
+        workoutId: event.target.elements.formWorkout.value,
+        repCount: event.target.elements.repCount.value,
+        setCount: event.target.elements.setCount.value,
+        exerciseOrder: event.target.elements.exerciseOrder.value
+    };
     
-    submitData(event) {
-        event.preventDefault();
-        const submitData = {
-            exerciseId: event.target.elements.formExercise.value,
-            workoutId: event.target.elements.formWorkout.value,
-            repCount: event.target.elements.repCount.value,
-            setCount: event.target.elements.setCount.value,
-            exerciseOrder: event.target.elements.exerciseOrder.value
-        };
-        
-        fetch('/insertWorkoutExercise', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(submitData)
-        })
-        .then(response => response.json())
-        .then(newData => {
-            if (newData.failure === undefined){
-                this.setState({
-                    data: newData,
-                    errorMessage: '',
-                });
-            }
-            else {
-                this.setState({errorMessage: "You cannot submit an exercise that already exists!"});
-            }
-        })
-        .catch((error) => {
-        console.error('Error:', error);
-        });
+    submitData(data, '/insertWorkoutExercise')
+    .then(newData => {
+      this.setState({data: newData});
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
 
-        //reset the form values
-        event.target.elements.formExercise.value = '';
-        event.target.elements.formWorkout.value = '';
-        event.target.elements.repCount.value = '';
-        event.target.elements.setCount.value = '';
-        event.target.elements.exerciseOrder.value = '';
-    }
+    //reset form values
+    event.target.elements.formExercise.value = '';
+    event.target.elements.formWorkout.value = '';
+    event.target.elements.repCount.value = '';
+    event.target.elements.setCount.value = '';
+    event.target.elements.exerciseOrder.value = '';
+  };
 
     componentDidMount() {
         // Simple GET request using fetch
@@ -138,7 +155,7 @@ class Exercises extends Component {
             <Row>
                 <Col>
                 <div style={style.inputForm}>
-                    <Form onSubmit={this.submitData}>
+                    <Form onSubmit={this.submitHandle}>
                         <Form.Label>Add Exercise to Workout</Form.Label>
                         
                         <Form.Row>
@@ -227,7 +244,7 @@ class Exercises extends Component {
                 {/* Here's our data check */}
                 {!isLoading ? (
                     data.map((data, i) => {
-                    const { id, workout_name, user_name, exercise_name, 
+                    const { id, workout_exercise_id, workout_name, user_name, exercise_name, 
                         sets, reps, exercise_order } = data;
                     return (
                         
@@ -240,9 +257,10 @@ class Exercises extends Component {
                                     <td>{reps}</td>
                                     <td>{exercise_order}</td>
                                     <td>
-                                        <Button 
+                                        <Button onClick={this.deleteHandle}
                                         variant="outline-danger" 
-                                        type="delete">
+                                        type="delete"
+                                        id={workout_exercise_id}>
                                             Delete Exercise
                                         </Button>
                                   </td>

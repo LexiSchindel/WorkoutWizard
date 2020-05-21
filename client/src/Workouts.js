@@ -1,9 +1,11 @@
 import React, { Component } from "react";
-import Table from 'react-bootstrap/Table'
-import { Row, Container, Col } from 'react-bootstrap'
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
+import Table from 'react-bootstrap/Table';
+import { Row, Container, Col } from 'react-bootstrap';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 import style from './style';
+import { deleteData } from './deleteData';
+import { submitData } from './submitData';
  
 class Workouts extends Component {
 
@@ -16,14 +18,39 @@ class Workouts extends Component {
         exercises: [],
         error: null
       };
-      this.handleSubmit = this.submitData.bind(this);
+      // this.handleSubmit = this.submitData.bind(this);
 
-      //need to bind "this" to submitData so it is able to update the state
-      this.submitData = this.submitData.bind(this);
-    }
+      //need to bind "this" to our on click handles so it is able to update the state
+      this.submitHandle = this.submitHandle.bind(this);
+      this.deleteHandle = this.deleteHandle.bind(this);
+    };
 
     /************************************************
-     * submitData:
+     * deleteHandle:
+     * Gets the workoutId to delete and passes it to the
+     * delete data function 
+     * 
+     * Delete request should return new "data" to update
+     * state with
+    ************************************************/
+    deleteHandle(event){
+      event.preventDefault();
+
+      let id = event.target.id;
+      let handle = '/deleteWorkout';
+
+      deleteData(id, handle)
+      .then(newData => {
+        this.setState({data: newData});
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+
+    };
+
+    /************************************************
+     * submitHandle:
      * gets data from the form fields, then submits
      * using fetch. Will update the state to rerender
      * the page with the updated data. 
@@ -31,9 +58,9 @@ class Workouts extends Component {
      * Post request should return new "data" to update
      * state with
     ************************************************/
-    submitData(event) {
+    submitHandle(event) {
       event.preventDefault();
-      const submitData = {
+      const data = {
         workoutName: event.target.elements.workoutName.value,
         User: event.target.elements.User.value,
         exerciseId: event.target.elements.exerciseName.value,
@@ -41,15 +68,7 @@ class Workouts extends Component {
         setCount: event.target.elements.setCount.value,
       };
       
-      fetch('/insertWorkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(submitData)
-      })
-      .then(response => response.json())
+      submitData(data, '/insertWorkout')
       .then(newData => {
         this.setState({data: newData});
       })
@@ -59,11 +78,11 @@ class Workouts extends Component {
 
       //reset form values
       event.target.elements.workoutName.value = "";
-      event.target.elements.User.placholder = "";
-      event.target.elements.exerciseName.placholder = "";
+      event.target.elements.User.value = "";
+      event.target.elements.exerciseName.value = "";
       event.target.elements.repCount.value = "";
       event.target.elements.setCount.value = "";
-    }
+    };
 
     componentDidMount() {
         // Simple GET request using fetch
@@ -99,7 +118,7 @@ class Workouts extends Component {
          .then((response) => {
              return response.json();
            })
-           .then(exercises =>
+           .then((exercises) =>
              this.setState({
               exercises: exercises,
                isLoading: false,
@@ -138,7 +157,7 @@ class Workouts extends Component {
             <Row>
                 <Col>
                 <div style={style.inputForm}>
-                <Form onSubmit={this.submitData}>
+                <Form onSubmit={this.submitHandle}>
                   <Form.Row>
                   <Form.Group as={Col} controlId="workoutName">
                     <Form.Label>Workout</Form.Label>
@@ -231,9 +250,10 @@ class Workouts extends Component {
                                       <td >{user_name}</td>
                                       <td>{total_exercises}</td>
                                       <td>
-                                          <Button 
+                                          <Button onClick={this.deleteHandle}
                                           variant="outline-danger" 
-                                          type="delete">
+                                          type="delete"
+                                          id={id}>
                                               Delete Workout
                                           </Button>
                                     </td>
