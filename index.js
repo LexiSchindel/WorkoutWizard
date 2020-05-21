@@ -130,6 +130,7 @@ workoutUsers =
   workoutSummary = 
   "select " +
     "ww.id, " +
+    "we.id as workout_exercise_id, " +
     "ww.name as workout_name, " +
     "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
     "ee.name as exercise_name, " +
@@ -252,8 +253,9 @@ app.post('/insertWorkout', function(req,res,error){
 
 /*********************************************************
 /deleteWorkout' handle:  
-Inserts a workout into the database
-Receives: nothing
+Deletes a workout from the database
+Receives: id to delete (Workout.id 
+    and Workouts_Exercises.workout_id)
 Returns: all rows from that table
 *********************************************************/
 app.delete('/deleteWorkout/:id', function(req,res,error){
@@ -362,6 +364,30 @@ app.post('/insertWorkoutExercise', function(req,res,error){
             .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
         }
     })
+});
+
+/*********************************************************
+/deleteWorkoutExercise' handle:  
+Deletes exercise from a workout
+Receives: id to delete (Workouts_Exercises.id)
+Returns: all rows from that table
+*********************************************************/
+app.delete('/deleteWorkoutExercise/:id', function(req,res,error){
+
+    let id = parseInt(req.params.id);
+    console.log("here: ", id);
+
+    let queryText = "DELETE FROM Workouts_Exercises WHERE id = ?;";
+
+    var query1 = {
+        text : queryText,
+        placeholder_arr : id,
+    };
+
+    //Insert new workout into Workouts
+    parameterQuery(query1)
+    //Then insert the submitted exercise into Workouts_Exercises
+    .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
 });
 
 /*********************************************************

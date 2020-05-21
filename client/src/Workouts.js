@@ -118,7 +118,7 @@ class Workouts extends Component {
          .then((response) => {
              return response.json();
            })
-           .then(exercises =>
+           .then((exercises) =>
              this.setState({
               exercises: exercises,
                isLoading: false,

@@ -35,7 +35,7 @@ class Exercises extends Component {
     event.preventDefault();
 
     let id = event.target.id;
-    let handle = '/deleteWorkout';
+    let handle = '/deleteWorkoutExercise';
 
     deleteData(id, handle)
     .then(newData => {
@@ -244,7 +244,7 @@ class Exercises extends Component {
                 {/* Here's our data check */}
                 {!isLoading ? (
                     data.map((data, i) => {
-                    const { id, workout_name, user_name, exercise_name, 
+                    const { id, workout_exercise_id, workout_name, user_name, exercise_name, 
                         sets, reps, exercise_order } = data;
                     return (
                         
@@ -257,9 +257,10 @@ class Exercises extends Component {
                                     <td>{reps}</td>
                                     <td>{exercise_order}</td>
                                     <td>
-                                        <Button 
+                                        <Button onClick={this.deleteHandle}
                                         variant="outline-danger" 
-                                        type="delete">
+                                        type="delete"
+                                        id={workout_exercise_id}>
                                             Delete Exercise
                                         </Button>
                                   </td>
