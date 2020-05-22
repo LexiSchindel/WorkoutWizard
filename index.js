@@ -501,3 +501,99 @@ app.get('*', (req, res) => {
   app.listen(port);
   
   console.log(`Workout Wizard listening on ${port}`);
+
+
+/*********************************************************
+/insertMuscleGroup handle:  
+Inserts a muscle group into the database
+Receives: nothing
+Returns: all rows from that table
+*********************************************************/
+app.post('/insertMuscleGroup', function(req,res,error){
+
+    let checkQuery = "SELECT id FROM Muscle_Groups WHERE lower(name) = lower(?);";
+
+    let check1 = {
+        text: checkQuery,
+        placeholder_arr: [req.body.muscleGroupName], 
+    };
+
+    let successQuery = "SELECT * FROM Muscle_Groups;";
+
+    let queryText = "INSERT INTO Muscle_Groups (name) " +
+        "VALUES (?);"; //muscleGroupName
+
+    let query1 = {
+        text : queryText,
+        placeholder_arr : [req.body.muscleGroupName],
+    };
+    
+    //check if we already have name in database, if so don't add again
+    parameterQuery(check1)
+    .then((response) => {
+        //if we do not have the data, then response.length == 0 so insert
+        if (response.length == 0){
+            //insert into Muscle_Groups
+            parameterQuery(query1)
+            .then(() => successCallback(successQuery, res)).catch(errorCallback);
+        }
+        //otherwise don't insert the data and return back a failure
+        else {
+            res.send(JSON.stringify(
+                {
+                    failure: true,
+                }
+            ));
+        }
+    })
+});
+
+
+/*********************************************************
+/insertUser handle:  
+Inserts a user into the database
+Receives: nothing
+Returns: all rows from that table
+*********************************************************/
+app.post('/insertUser', function(req,res,error){
+
+    let checkQuery = "SELECT id FROM Users WHERE lower(email) = lower(?);";
+
+    let check1 = {
+        text: checkQuery,
+        placeholder_arr: [req.body.email], 
+    };
+
+    let successQuery = "SELECT * FROM Users;";
+
+    let queryText = "INSERT INTO Users (first_name, last_name, email, created_at) " +
+    "VALUES (?, " + // firstName
+    "?, " + // lastName
+    "?, " + // email
+    "now()" + // created_at
+    ");";
+
+    let query1 = {
+        text : queryText,
+        placeholder_arr: [req.body.firstName, req.body.lastName, req.body.email], 
+    };
+    
+    //check if we already have name in database, if so don't add again
+    parameterQuery(check1)
+    .then((response) => {
+        //if we do not have the data, then response.length == 0 so insert
+        if (response.length == 0){
+            //insert into Muscle_Groups
+            parameterQuery(query1)
+            .then(() => successCallback(successQuery, res)).catch(errorCallback);
+        }
+        //otherwise don't insert the data and return back a failure
+        else {
+            res.send(JSON.stringify(
+                {
+                    failure: true,
+                }
+            ));
+        }
+    })
+});
