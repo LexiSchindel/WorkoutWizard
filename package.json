@@ -31,6 +31,6 @@
     "rsvp": "^4.8.5"
   },
   "devDependencies": {
-    "concurrently": "^5.1.0"
+    "concurrently": "^5.2.0"
   }
 }

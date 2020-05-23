@@ -60,7 +60,7 @@ class Exercises_MuscleGroups extends Component {
                 });
             }
             else {
-                this.setState({errorMessage: "Oops!"});
+                this.setState({errorMessage: "That muscle group association already exists!"});
             }
         })
         .catch((error) => {
@@ -154,7 +154,7 @@ class Exercises_MuscleGroups extends Component {
 						<Form.Group as={Col} controlId="formExercise">
                             {/* <Form.Label>Workout Author</Form.Label> */}
                             <Form.Control as="select" placeholder="Search...">
-                                <option>Select Exercise...</option>
+                                <option></option>
 
                                 {/* Loops through user names to populate form dropdown */}
                                 {exercises.map(exercises => {
@@ -170,7 +170,7 @@ class Exercises_MuscleGroups extends Component {
                         <Form.Group as={Col} controlId="formMuscleGroup">
                             {/* <Form.Label>Workout Author</Form.Label> */}
                             <Form.Control as="select" placeholder="Search...">
-                                <option>Select Muscle Group...</option>
+                                <option></option>
 
                                 {/* Loops through user names to populate form dropdown */}
                                 {muscleGroups.map(muscleGroups => {

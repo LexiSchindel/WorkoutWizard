@@ -20,8 +20,55 @@ class Users extends Component {
 
         //need to bind "this" to submitData so it is able to update the state
         this.submitData = this.submitData.bind(this);
+        
+        
+        this.searchData = this.searchData.bind(this);
     }
 
+
+    /************************************************
+     * searchData:
+     * gets data from the form fields, then submits
+     * using fetch. Will update the state to rerender
+     * the page with the updated data. 
+     * 
+     * Post request should return new "data" to update
+     * state with
+    ************************************************/
+   searchData(event) {
+    event.preventDefault();
+    const searchData = {
+
+        searchParameter: event.target.elements.formSearchParameter.value
+    };
+    console.log("search click");
+
+    fetch('/searchUser', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(searchData)
+    })
+    .then(response => response.json())
+    .then(newData => {
+        if (newData.failure === undefined){
+            this.setState({
+                data: newData,
+                errorMessage: '',
+            });
+        }
+        else {
+            this.setState({errorMessage: "User does not exist"});
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        });
+
+        event.target.elements.formSearchParameter.value = '';
+}
 
     /************************************************
      * submitData:
@@ -113,7 +160,7 @@ class Users extends Component {
             <Row>
                 <Col>
                 <div style={style.inputForm}>
-                    <Form>
+                    <Form onSubmit={this.searchData}>
                         <Form.Label>Search User</Form.Label>
 
                         <Form.Row>

@@ -156,6 +156,19 @@ workoutUsers =
     "order by ww.id, we.exercise_order" +
     ";";
 
+    // used for exercises_musclegroups page to display table
+    exercisesMuscleGroups =
+    "SELECT " +
+    "emg.id, " +
+    "ee.name as exercise_name, " +
+    "mg.name as musclegrp_name " +
+    
+    "FROM exercises_musclegroups emg " +
+    "JOIN exercises ee on ee.id = emg.exercise_id " +
+    "JOIN muscle_groups mg on mg.id = emg.musclegrp_id " +
+    "ORDER BY emg.id ASC" +
+    ";";
+
 /*********************************************************
 /getTable handle:  
 Grabs all the data from the table (based on the passed
@@ -473,21 +486,10 @@ Returns: all rows from that table
 *********************************************************/
 app.get('/getExercises_MuscleGroups', async function(req,res,next){
 
-    //query returns workout id, workout name, user name, exercise names,
-    //sets, reps, exercise order, and the total # of exercises in workout
-    let query = "SELECT " +
-    "emg.id, " +
-    "ee.name as exercise_name, " +
-    "mg.name as musclegrp_name " +
-    
-    "FROM exercises_musclegroups emg " +
-    "JOIN exercises ee on ee.id = emg.exercise_id " +
-    "JOIN muscle_groups mg on mg.id = emg.musclegrp_id " +
-    "ORDER BY emg.id ASC" +
-    ";";
+    //query exercisesMuscleGroups returns exercise id and workout id by name
 
     //execute the query and the send the results back to the client
-    executeQuery(query, function(context){
+    executeQuery(exercisesMuscleGroups, function(context){
         // console.log("context", context);
         res.send(context);
     });
@@ -528,7 +530,7 @@ app.post('/insertMuscleGroup', function(req,res,error){
         placeholder_arr : [req.body.muscleGroupName],
     };
     
-    //check if we already have name in database, if so don't add again
+    //check if we already have muscle group name in database, if so don't add again
     parameterQuery(check1)
     .then((response) => {
         //if we do not have the data, then response.length == 0 so insert
@@ -578,7 +580,7 @@ app.post('/insertUser', function(req,res,error){
         placeholder_arr: [req.body.firstName, req.body.lastName, req.body.email], 
     };
     
-    //check if we already have name in database, if so don't add again
+    //check if we already have email in database, if so don't add again
     parameterQuery(check1)
     .then((response) => {
         //if we do not have the data, then response.length == 0 so insert
@@ -606,20 +608,14 @@ Returns: all rows from that table
 *********************************************************/
 app.post('/insertExercisesMuscleGroups', function(req,res,error){
 
-    console.log("insertEMG");
-    console.log(req.body.exerciseID);
-    console.log(req.body.muscleGroupID);
-
     let checkQuery = "SELECT id FROM Exercises_MuscleGroups " +
         "WHERE exercise_id = ? " +
         "AND musclegrp_id = ?;";
 
     let check1 = {
         text: checkQuery,
-        // placeholder_arr: [0, 0], 
         placeholder_arr: [req.body.exerciseID, req.body.muscleGroupID], 
     };
-
 
     let queryText = "INSERT INTO Exercises_MuscleGroups (exercise_id, musclegrp_id) " +
         "VALUES (?, " + //exerciseId
@@ -630,28 +626,12 @@ app.post('/insertExercisesMuscleGroups', function(req,res,error){
         placeholder_arr: [req.body.exerciseID, req.body.muscleGroupID]
     };
 
-    let successQuery = "SELECT " +
-    "emg.id, " +
-    "ee.name as exercise_name, " +
-    "mg.name as musclegrp_name " +
-    
-    "FROM exercises_musclegroups emg " +
-    "JOIN exercises ee on ee.id = emg.exercise_id " +
-    "JOIN muscle_groups mg on mg.id = emg.musclegrp_id " +
-    "ORDER BY emg.id ASC" +
-    ";";
-       
-    
-
-    // parameterQuery(query1)
-    // .then(() => successCallback(successQuery, res)).catch(errorCallback);
-
     parameterQuery(check1)
     .then((response) => {
         if(response.length == 0){
             // insert into exercise_musclegroups
             parameterQuery(query1)
-            .then(() => successCallback(successQuery, res)).catch(errorCallback);
+            .then(() => successCallback(exercisesMuscleGroups, res)).catch(errorCallback);
         }
         //otherwise don't insert the data and return back a failure
         else {
@@ -661,58 +641,8 @@ app.post('/insertExercisesMuscleGroups', function(req,res,error){
                 }
             ));
         }
-
-
-
     })
-
-
-    // let checkQuery = "SELECT id FROM Users WHERE lower(email) = lower(?);";
-
-    // let check1 = {
-    //     text: checkQuery,
-    //     placeholder_arr: [req.body.email], 
-    // };
-
-    // let successQuery = "SELECT * FROM Users;";
-
-    // let queryText = "INSERT INTO Users (first_name, last_name, email, created_at) " +
-    // "VALUES (?, " + // firstName
-    // "?, " + // lastName
-    // "?, " + // email
-    // "now()" + // created_at
-    // ");";
-
-    // let query1 = {
-    //     text : queryText,
-    //     placeholder_arr: [req.body.firstName, req.body.lastName, req.body.email], 
-    // };
-    
-    // //check if we already have name in database, if so don't add again
-    // parameterQuery(check1)
-    // .then((response) => {
-    //     //if we do not have the data, then response.length == 0 so insert
-    //     if (response.length == 0){
-    //         //insert into Muscle_Groups
-    //         parameterQuery(query1)
-    //         .then(() => successCallback(successQuery, res)).catch(errorCallback);
-    //     }
-    //     //otherwise don't insert the data and return back a failure
-    //     else {
-    //         res.send(JSON.stringify(
-    //             {
-    //                 failure: true,
-    //             }
-    //         ));
-    //     }
-    // })
 });
-
-
-
-
-
-
 
 
 
@@ -768,93 +698,4 @@ app.post('/searchUser', function(req,res,error){
             ));
         }
     })
-
-
-
-
-
-    // function successCallback(query, res){
-    //     //execute the query and the send the results back to the client
-    //     executeQuery(query, function(context){
-    //         res.send(context);
-    //     });
-    //   }
-    
-    //   function executeQuery(query, callback){
-    //     mysql.pool.query(query, function(err, rows){
-    //         if(err){
-    //             console.log('error');
-    //             next(err);
-    //         }
-    //         // console.log("row: ", rows);
-    //         callback(rows);
-    //     });
-    // }
-    
-    // function parameterQuery(query) {
-    //     return new Promise(function(resolve, reject) {
-    //         try {
-    //             mysql.pool.query(query.text, query.placeholder_arr, function(err, rows, fields) {
-    //                 if (err) {
-    //                     return reject(err);
-    //                 } else {
-    //                     return resolve(rows);
-    //                 }
-    //             });
-    //         } catch (err) {
-    //             return reject(err);
-    //         }
-    //     })
-    // };
-    
-
-
-
-
-
-
-
-    // let successQuery = "SELECT * FROM Users WHERE first_name = 'Kelley'";
-    // executeQuery(successQuery)
-    // .then(() => successCallback(successQuery, res)).catch(errorCallback);
-
-    // let checkQuery = "SELECT id FROM Users WHERE lower(email) = lower(?);";
-
-    // let check1 = {
-    //     text: checkQuery,
-    //     placeholder_arr: [req.body.email], 
-    // };
-
-    // let successQuery = "SELECT * FROM Users WHERE first_name = 'Kelley'";
-    
-    
-    // let queryText = "SELECT * FROM Users" + 
-    //     "WHERE first_name LIKE %?% " +
-    //     "OR last_name LIKE %?% " +
-    //     "OR email LIKE %?%" +
-    //     ";";
-
-    // let query1 = {
-    //     text : queryText,
-    //     placeholder_arr: [req.body.searchParameter, req.body.searchParameter, req.body.searchParameter], 
-    // };
-    
-    // //check if we already have name in database, if so don't add again
-    // parameterQuery(check1)
-    // .then((response) => {
-    //     //if we do not have the data, then response.length == 0 so insert
-    //     if (response.length != 0){
-    //         //insert into Muscle_Groups
-    //         parameterQuery(query1)
-    //         .then(() => successCallback(successQuery, res)).catch(errorCallback);
-    //     }
-    //     //otherwise don't insert the data and return back a failure
-    //     else {
-    //         res.send(JSON.stringify(
-    //             {
-    //                 failure: true,
-    //             }
-    //         ));
-    //     }
-    // })
 });
