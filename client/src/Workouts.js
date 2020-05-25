@@ -36,10 +36,13 @@ class Workouts extends Component {
     deleteHandle(event){
       event.preventDefault();
 
-      let id = event.target.id;
       let handle = '/deleteWorkout';
 
-      deleteData(id, handle)
+      let body = {
+        id: event.target.id,
+      }
+
+      deleteData(body, handle)
       .then(newData => {
         this.setState({data: newData});
       })

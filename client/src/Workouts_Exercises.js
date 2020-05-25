@@ -31,10 +31,11 @@ class Exercises extends Component {
      * Delete request should return new "data" to update
      * state with
     ************************************************/
-   deleteHandle(event){
+   deleteHandle(event, workout_exercise_id, id, exercise_order){
     event.preventDefault();
+    
+    console.log(workout_exercise_id, id, exercise_order);
 
-    let id = event.target.id;
     let handle = '/deleteWorkoutExercise';
 
     deleteData(id, handle)
@@ -257,10 +258,10 @@ class Exercises extends Component {
                                     <td>{reps}</td>
                                     <td>{exercise_order}</td>
                                     <td>
-                                        <Button onClick={this.deleteHandle}
+                                        <Button onClick={(e) => { this.deleteHandle(e, workout_exercise_id, id, exercise_order)}}
                                         variant="outline-danger" 
                                         type="delete"
-                                        id={workout_exercise_id}>
+                                        id={id}>
                                             Delete Exercise
                                         </Button>
                                   </td>

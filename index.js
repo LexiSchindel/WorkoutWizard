@@ -258,9 +258,9 @@ Receives: id to delete (Workout.id
     and Workouts_Exercises.workout_id)
 Returns: all rows from that table
 *********************************************************/
-app.delete('/deleteWorkout/:id', function(req,res,error){
+app.delete('/deleteWorkout', function(req,res,error){
 
-    let id = parseInt(req.params.id);
+    let id = parseInt(req.query.id);
 
     let queryText = "DELETE FROM Workouts_Exercises WHERE workout_id = ?;";
 
@@ -372,22 +372,93 @@ Deletes exercise from a workout
 Receives: id to delete (Workouts_Exercises.id)
 Returns: all rows from that table
 *********************************************************/
-app.delete('/deleteWorkoutExercise/:id', function(req,res,error){
+app.delete('/deleteWorkoutExercise', function(req,res,error){
 
-    let id = parseInt(req.params.id);
-    console.log("here: ", id);
+    let id = parseInt(req.param.id);
+    let workout_id = parseInt(req.body.workout_id);
+    let exerciseOrder = parseInt(req.body.exerciseOrder);
+
+    let maxOrderQuery = "SELECT max(exercise_order) as max FROM Workouts_Exercises " +
+        "WHERE workout_id = (SELECT workout_id FROM Workouts_Exercises where id = ?);";
 
     let queryText = "DELETE FROM Workouts_Exercises WHERE id = ?;";
+
+    let workoutIdQuery = "SELECT workout_id FROM Workouts_Exercises where id = ?;";
+
+    var maxQuery = {
+        text : maxOrderQuery,
+        placeholder_arr : id,
+    };
 
     var query1 = {
         text : queryText,
         placeholder_arr : id,
     };
 
-    //Insert new workout into Workouts
-    parameterQuery(query1)
-    //Then insert the submitted exercise into Workouts_Exercises
-    .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
+    parameterQuery(maxQuery)
+    .then((row) => {
+        let max = row[0].max;
+
+        //if we only have 1 exercise in workout send error
+        //cannot delete last exercise from workout
+        if (max == 1)
+        {
+            res.send(JSON.stringify(
+                {
+                    failure: true,
+                }
+            ));
+        }
+
+        //if this is deleted from middle of current workout order
+        //then decrement all exerciseOrder above
+        else if (req.body.exerciseOrder <= max)
+        {
+            let i = max;
+            /*
+            * Iterate through max -> exerciseOrder and adjust
+            * exercise_order up for each item for workout_id
+            */
+            promiseWhile(function(){
+                return i >= req.body.exerciseOrder;
+            },function(){
+                return new RSVP.Promise(function(resolve, reject){
+                    setTimeout(function(){
+                        let incOrderNum = {
+                            text: queryText,
+                            placeholder_arr: [i+1, req.body.workoutId, i],
+                        };
+                        i--;
+                        resolve(parameterQuery(incOrderNum));
+                    },200);
+                });
+            })
+            //after we've incremented to make space, insert the new exercise
+            .then(() => {
+                let insertQuery = {
+                    text: queryText2,
+                    placeholder_arr: [req.body.workoutId, req.body.exerciseId, 
+                        req.body.repCount, req.body.setCount, req.body.exerciseOrder],
+                };
+                parameterQuery(insertQuery)
+                //finally get refreshed data and send it back as the post response  
+                .then(() => {
+                    successCallback(workoutSummary, res)})
+                .catch(errorCallback);
+            });
+        }
+        //otherwise just add on new exercise to the end
+        else 
+        {
+            let addEndQuery = {
+                text: queryText2,
+                placeholder_arr: [req.body.workoutId, req.body.exerciseId, 
+                    req.body.repCount, req.body.setCount, max + 1],
+            };
+            parameterQuery(addEndQuery)
+            .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
+        }
+    })
 });
 
 /*********************************************************
