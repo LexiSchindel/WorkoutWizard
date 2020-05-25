@@ -238,6 +238,14 @@ class Exercises extends Component {
             <br />
 
             <Row>
+                <div>
+                    { this.state.errorMessage &&
+                        <p className="error"> { this.state.errorMessage } </p> 
+                    }
+                </div>
+            </Row>
+
+            <Row>
             <Table striped bordered hover size="sm" responsive>
                 <thead>
                     <tr>
@@ -289,13 +297,6 @@ class Exercises extends Component {
 
                 </tbody>
             </Table>
-            </Row>
-            <Row>
-                <div>
-                    { this.state.errorMessage &&
-                        <p className="error"> { this.state.errorMessage } </p> 
-                    }
-                </div>
             </Row>
             </Container>
         </div>
