@@ -16,7 +16,8 @@ class Exercises extends Component {
             workouts: [],
             exercises: [],
             data: [],
-            error: null
+            error: null,
+            errorMessage: ''
           }
 
         this.submitHandle = this.submitHandle.bind(this);
@@ -33,17 +34,29 @@ class Exercises extends Component {
     ************************************************/
    deleteHandle(event, workout_exercise_id, id, exercise_order){
     event.preventDefault();
-    
-    console.log(workout_exercise_id, id, exercise_order);
 
     let handle = '/deleteWorkoutExercise';
 
-    deleteData(id, handle)
+    let data = {
+        workout_exercise_id: workout_exercise_id,
+        id: id, 
+        exerciseOrder: exercise_order
+    };
+
+    deleteData(data, handle)
     .then(newData => {
-      this.setState({data: newData});
+        if (newData.failure === undefined){
+            this.setState({
+                data: newData,
+                errorMessage: '',
+            });
+        }
+        else {
+            this.setState({errorMessage: "You cannot delete the last exercise from a workout!"});
+        }
     })
     .catch((error) => {
-      console.error('Error:', error);
+    console.error('Error:', error);
     });
 
   };
@@ -276,6 +289,13 @@ class Exercises extends Component {
 
                 </tbody>
             </Table>
+            </Row>
+            <Row>
+                <div>
+                    { this.state.errorMessage &&
+                        <p className="error"> { this.state.errorMessage } </p> 
+                    }
+                </div>
             </Row>
             </Container>
         </div>

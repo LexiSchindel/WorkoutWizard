@@ -271,9 +271,9 @@ Receives: id to delete (Workout.id
     and Workouts_Exercises.workout_id)
 Returns: all rows from that table
 *********************************************************/
-app.delete('/deleteWorkout', function(req,res,error){
+app.post('/deleteWorkout', function(req,res,error){
 
-    let id = parseInt(req.query.id);
+    let id = parseInt(req.body.id);
 
     let queryText = "DELETE FROM Workouts_Exercises WHERE workout_id = ?;";
 
@@ -385,27 +385,28 @@ Deletes exercise from a workout
 Receives: id to delete (Workouts_Exercises.id)
 Returns: all rows from that table
 *********************************************************/
-app.delete('/deleteWorkoutExercise', function(req,res,error){
+app.post('/deleteWorkoutExercise', function(req,res,error){
 
-    let id = parseInt(req.param.id);
-    let workout_id = parseInt(req.body.workout_id);
+    let workout_id = parseInt(req.body.id);
+    let workout_exercise_id = parseInt(req.body.workout_exercise_id);
     let exerciseOrder = parseInt(req.body.exerciseOrder);
 
     let maxOrderQuery = "SELECT max(exercise_order) as max FROM Workouts_Exercises " +
-        "WHERE workout_id = (SELECT workout_id FROM Workouts_Exercises where id = ?);";
+        "WHERE workout_id = ?;";
 
     let queryText = "DELETE FROM Workouts_Exercises WHERE id = ?;";
 
-    let workoutIdQuery = "SELECT workout_id FROM Workouts_Exercises where id = ?;";
+    let decQuery = "UPDATE Workouts_Exercises SET exercise_order = ? " +
+    "WHERE workout_id = ? AND exercise_order = ?;";
 
     var maxQuery = {
         text : maxOrderQuery,
-        placeholder_arr : id,
+        placeholder_arr : workout_id,
     };
 
-    var query1 = {
+    var deleteQuery = {
         text : queryText,
-        placeholder_arr : id,
+        placeholder_arr : workout_exercise_id,
     };
 
     parameterQuery(maxQuery)
@@ -425,35 +426,30 @@ app.delete('/deleteWorkoutExercise', function(req,res,error){
 
         //if this is deleted from middle of current workout order
         //then decrement all exerciseOrder above
-        else if (req.body.exerciseOrder <= max)
+        else if (exerciseOrder < max)
         {
-            let i = max;
+            let i = exerciseOrder + 1;
             /*
             * Iterate through max -> exerciseOrder and adjust
             * exercise_order up for each item for workout_id
             */
             promiseWhile(function(){
-                return i >= req.body.exerciseOrder;
+                return i <= max;
             },function(){
                 return new RSVP.Promise(function(resolve, reject){
                     setTimeout(function(){
-                        let incOrderNum = {
-                            text: queryText,
-                            placeholder_arr: [i+1, req.body.workoutId, i],
+                        let decOrderNum = {
+                            text: decQuery,
+                            placeholder_arr: [i-1, workout_id, i],
                         };
-                        i--;
-                        resolve(parameterQuery(incOrderNum));
+                        i++;
+                        resolve(parameterQuery(decOrderNum));
                     },200);
                 });
             })
-            //after we've incremented to make space, insert the new exercise
+            //after we've decremented all other exercises, delete the exercise
             .then(() => {
-                let insertQuery = {
-                    text: queryText2,
-                    placeholder_arr: [req.body.workoutId, req.body.exerciseId, 
-                        req.body.repCount, req.body.setCount, req.body.exerciseOrder],
-                };
-                parameterQuery(insertQuery)
+                parameterQuery(deleteQuery)
                 //finally get refreshed data and send it back as the post response  
                 .then(() => {
                     successCallback(workoutSummary, res)})
@@ -463,13 +459,8 @@ app.delete('/deleteWorkoutExercise', function(req,res,error){
         //otherwise just add on new exercise to the end
         else 
         {
-            let addEndQuery = {
-                text: queryText2,
-                placeholder_arr: [req.body.workoutId, req.body.exerciseId, 
-                    req.body.repCount, req.body.setCount, max + 1],
-            };
-            parameterQuery(addEndQuery)
-            .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
+        parameterQuery(deleteQuery)
+        .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
         }
     })
 });
