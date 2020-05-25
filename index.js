@@ -271,9 +271,9 @@ Receives: id to delete (Workout.id
     and Workouts_Exercises.workout_id)
 Returns: all rows from that table
 *********************************************************/
-app.delete('/deleteWorkout/:id', function(req,res,error){
+app.post('/deleteWorkout', function(req,res,error){
 
-    let id = parseInt(req.params.id);
+    let id = parseInt(req.body.id);
 
     let queryText = "DELETE FROM Workouts_Exercises WHERE workout_id = ?;";
 
@@ -385,22 +385,84 @@ Deletes exercise from a workout
 Receives: id to delete (Workouts_Exercises.id)
 Returns: all rows from that table
 *********************************************************/
-app.delete('/deleteWorkoutExercise/:id', function(req,res,error){
+app.post('/deleteWorkoutExercise', function(req,res,error){
 
-    let id = parseInt(req.params.id);
-    console.log("here: ", id);
+    let workout_id = parseInt(req.body.id);
+    let workout_exercise_id = parseInt(req.body.workout_exercise_id);
+    let exerciseOrder = parseInt(req.body.exerciseOrder);
+
+    let maxOrderQuery = "SELECT max(exercise_order) as max FROM Workouts_Exercises " +
+        "WHERE workout_id = ?;";
 
     let queryText = "DELETE FROM Workouts_Exercises WHERE id = ?;";
 
-    var query1 = {
-        text : queryText,
-        placeholder_arr : id,
+    let decQuery = "UPDATE Workouts_Exercises SET exercise_order = ? " +
+    "WHERE workout_id = ? AND exercise_order = ?;";
+
+    var maxQuery = {
+        text : maxOrderQuery,
+        placeholder_arr : workout_id,
     };
 
-    //Insert new workout into Workouts
-    parameterQuery(query1)
-    //Then insert the submitted exercise into Workouts_Exercises
-    .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
+    var deleteQuery = {
+        text : queryText,
+        placeholder_arr : workout_exercise_id,
+    };
+
+    parameterQuery(maxQuery)
+    .then((row) => {
+        let max = row[0].max;
+
+        //if we only have 1 exercise in workout send error
+        //cannot delete last exercise from workout
+        if (max == 1)
+        {
+            res.send(JSON.stringify(
+                {
+                    failure: true,
+                }
+            ));
+        }
+
+        //if this is deleted from middle of current workout order
+        //then decrement all exerciseOrder above
+        else if (exerciseOrder < max)
+        {
+            let i = exerciseOrder + 1;
+            /*
+            * Iterate through max -> exerciseOrder and adjust
+            * exercise_order up for each item for workout_id
+            */
+            promiseWhile(function(){
+                return i <= max;
+            },function(){
+                return new RSVP.Promise(function(resolve, reject){
+                    setTimeout(function(){
+                        let decOrderNum = {
+                            text: decQuery,
+                            placeholder_arr: [i-1, workout_id, i],
+                        };
+                        i++;
+                        resolve(parameterQuery(decOrderNum));
+                    },200);
+                });
+            })
+            //after we've decremented all other exercises, delete the exercise
+            .then(() => {
+                parameterQuery(deleteQuery)
+                //finally get refreshed data and send it back as the post response  
+                .then(() => {
+                    successCallback(workoutSummary, res)})
+                .catch(errorCallback);
+            });
+        }
+        //otherwise just add on new exercise to the end
+        else 
+        {
+        parameterQuery(deleteQuery)
+        .then(() => successCallback(workoutSummary, res)).catch(errorCallback);
+        }
+    })
 });
 
 /*********************************************************
