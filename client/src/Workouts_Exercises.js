@@ -160,7 +160,9 @@ class Exercises extends Component {
                             <br />
                             <br />
                             If you delete an Exercise from a workout, the remaining exercises will
-                            move adjust order so order is maintained without gaps.
+                            move adjust order so order is maintained without gaps. You cannot delete 
+                            the last exercise from a Workout as each Workout must have at least 1 
+                            exercise. To delete the Workout, go to the Workouts page.
                         </p>
                     </div>
                 </Row>
