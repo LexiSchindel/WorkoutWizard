@@ -4,19 +4,81 @@ import { Row, Container, Col } from 'react-bootstrap'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import style from './style';
+import Spinner from 'react-bootstrap/Spinner'
 
 // import ReactDOM from "react-dom";
 
  
 class Exercises_MuscleGroups extends Component {
 
-    state = {
-        isLoading: true,
-		data: [],
-		exercises: [],
-		muscleGroups: [],
-        error: null
-      }
+    constructor() {
+        super();
+        this.state = {
+            isLoading: true,
+            data: [],
+            exercises: [],
+            muscleGroups: [],
+            error: null
+          }
+          this.handleSubmit = this.submitData.bind(this);
+
+          //need to bind "this" to submitData so it is able to update the state
+          this.submitData = this.submitData.bind(this);
+    }
+    
+    /************************************************
+     * submitData:
+     * gets data from the form fields, then submits
+     * using fetch. Will update the state to rerender
+     * the page with the updated data. 
+     * 
+     * Post request should return new "data" to update
+     * state with
+    ************************************************/
+   submitData(event) {
+        
+        event.preventDefault();
+        const submitData = {
+            muscleGroupID: event.target.elements.formMuscleGroup.value,
+            exerciseID: event.target.elements.formExercise.value
+        };
+        
+        fetch('/insertExercisesMuscleGroups', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify(submitData)
+        })
+        .then(response => response.json())
+        .then(newData => {
+            if (newData.failure === undefined){
+                this.setState({
+                    data: newData,
+                    errorMessage: '',
+                });
+            }
+            else {
+                this.setState({errorMessage: "That muscle group association already exists!"});
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            });
+
+            event.target.elements.formMuscleGroup.value = '';
+            event.target.elements.formExercise.value = '';
+    }
+
+
+
+
+
+
+
+
+
 
     componentDidMount() {
         // Simple GET request using fetch
@@ -85,20 +147,20 @@ class Exercises_MuscleGroups extends Component {
             <Row>
                 <Col>
                 <div style={style.inputForm}>
-                    <Form>
+                    <Form onSubmit={this.submitData}>
                         <Form.Label>Add Exercise/ Muscle Group Associations</Form.Label>
                         
                         <Form.Row>
 						<Form.Group as={Col} controlId="formExercise">
                             {/* <Form.Label>Workout Author</Form.Label> */}
                             <Form.Control as="select" placeholder="Search...">
-                                <option>Select Exercise...</option>
+                                <option></option>
 
                                 {/* Loops through user names to populate form dropdown */}
                                 {exercises.map(exercises => {
                                 const { id, name } = exercises;
                                 return (
-                                    <option key={id}>{name}</option>
+                                    <option key={id} value={id}>{name}</option>
                                 );
                                 })}
 
@@ -108,13 +170,13 @@ class Exercises_MuscleGroups extends Component {
                         <Form.Group as={Col} controlId="formMuscleGroup">
                             {/* <Form.Label>Workout Author</Form.Label> */}
                             <Form.Control as="select" placeholder="Search...">
-                                <option>Select Muscle Group...</option>
+                                <option></option>
 
                                 {/* Loops through user names to populate form dropdown */}
                                 {muscleGroups.map(muscleGroups => {
                                 const { id, name } = muscleGroups;
                                 return (
-                                    <option key={id}>{name}</option>
+                                    <option key={id} value={id}>{name}</option>
                                 );
                                 })}
 
@@ -130,6 +192,15 @@ class Exercises_MuscleGroups extends Component {
                     </Form>
                 </div>
                 </Col>
+            </Row>
+
+            {/* Error message */}
+            <Row>
+                <div>
+                    { this.state.errorMessage &&
+                        <p className="error"> { this.state.errorMessage } </p> 
+                    }
+                </div>
             </Row>
             <br />
             <br />
@@ -165,7 +236,11 @@ class Exercises_MuscleGroups extends Component {
                     })
                 // If there is a delay in data, let's let the user know it's loading
                 ) : (
-                    <tr><td>Loading...</td></tr>
+                    <tr><td colSpan="4">Loading &nbsp;
+                        <Spinner animation="border" size ="sm" role="status">
+                            <span className="sr-only">Loading...</span>
+                        </Spinner>
+                    </td></tr>
                 )}
 
                 </tbody>

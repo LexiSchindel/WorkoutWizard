@@ -8,19 +8,119 @@ import Spinner from 'react-bootstrap/Spinner'
  
 class Users extends Component {
 
-	// componentDidMount() {
-    //     // Simple GET request using fetch
-    //     fetch('http://localhost:5000/addUsers')
-    //         .then(response => response.json())
-    //         .then(data => this.setState({ totalReactPackages: data.total }));
-    // }
+	constructor() {
+        super();
+        this.state = {
+            isLoading: true,
+            data: [],
+            error: null,
+            errorMessage:''
+        };
+        this.handleSubmit = this.submitData.bind(this);
 
-    state = {
-        isLoading: true,
-        data: [],
-        error: null
-      }
+        //need to bind "this" to submitData so it is able to update the state
+        this.submitData = this.submitData.bind(this);
+        
+        
+        this.searchData = this.searchData.bind(this);
+    }
 
+
+    /************************************************
+     * searchData:
+     * gets data from the form fields, then submits
+     * using fetch. Will update the state to rerender
+     * the page with the updated data. 
+     * 
+     * Post request should return new "data" to update
+     * state with
+    ************************************************/
+   searchData(event) {
+    event.preventDefault();
+    const searchData = {
+
+        searchParameter: event.target.elements.formSearchParameter.value
+    };
+    console.log("search click");
+
+    fetch('/searchUser', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(searchData)
+    })
+    .then(response => response.json())
+    .then(newData => {
+        if (newData.failure === undefined){
+            this.setState({
+                data: newData,
+                errorMessage: '',
+            });
+        }
+        else {
+            this.setState({errorMessage: "User does not exist"});
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        });
+
+        event.target.elements.formSearchParameter.value = '';
+}
+
+    /************************************************
+     * submitData:
+     * gets data from the form fields, then submits
+     * using fetch. Will update the state to rerender
+     * the page with the updated data. 
+     * 
+     * Post request should return new "data" to update
+     * state with
+    ************************************************/
+   submitData(event) {
+        event.preventDefault();
+        const submitData = {
+            firstName: event.target.elements.formFirstName.value,
+            lastName: event.target.elements.formLastName.value,
+            email: event.target.elements.formEmail.value
+        };
+        
+        fetch('/insertUser', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify(submitData)
+        })
+        .then(response => response.json())
+        .then(newData => {
+            if (newData.failure === undefined){
+                this.setState({
+                    data: newData,
+                    errorMessage: '',
+                });
+            }
+            else {
+                this.setState({errorMessage: "Please enter a unique email"});
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            });
+
+            event.target.elements.formFirstName.value = '';
+            event.target.elements.formLastName.value = '';
+            event.target.elements.formEmail.value = '';
+    }
+
+
+
+
+
+    
     componentDidMount() {
         // Simple GET request using fetch
         fetch('/getTable?table=Users')
@@ -60,11 +160,11 @@ class Users extends Component {
             <Row>
                 <Col>
                 <div style={style.inputForm}>
-                    <Form>
+                    <Form onSubmit={this.searchData}>
                         <Form.Label>Search User</Form.Label>
 
                         <Form.Row>
-                        <Form.Group as={Col} controlId="searchParameter">
+                        <Form.Group as={Col} controlId="formSearchParameter">
                             {/* <Form.Label>Add User</Form.Label> */}
                             <Form.Control 
                             required 
@@ -74,10 +174,10 @@ class Users extends Component {
                         </Form.Group>
                         </Form.Row>
 
-                    
+{/*                     
                         <Form.Row>
 
-                        <Form.Group as={Col} controlId="userLastName">
+                        <Form.Group as={Col} controlId="search">
                         <fieldset>
                             <Form.Group as={Row}>
                             <Form.Label as="legend" column sm={12}>
@@ -107,7 +207,7 @@ class Users extends Component {
                         </fieldset>
                         </Form.Group>
 
-                        </Form.Row>
+                        </Form.Row> */}
 
                         <Button 
                         variant="primary" 
@@ -153,7 +253,7 @@ class Users extends Component {
                     })
                 // If there is a delay in data, let's let the user know it's loading
                 ) : (
-                    <tr><td colSpan="4">
+                    <tr><td colSpan="4">Loading &nbsp;
                         <Spinner animation="border" size ="sm" role="status">
                             <span className="sr-only">Loading...</span>
                         </Spinner>
@@ -170,36 +270,36 @@ class Users extends Component {
             <Row>
                 <Col>
                 <div style={style.inputForm}>
-                    <Form>
+                    <Form onSubmit={this.submitData}>
                         <Form.Label>Add User</Form.Label>
 
                         <Form.Row>
-                        <Form.Group as={Col} controlId="usersFirstName">
+                        <Form.Group as={Col} controlId="formFirstName">
                             {/* <Form.Label>Add User</Form.Label> */}
                             <Form.Control 
                             required 
                             type="text" 
-                            name="userName"
+                            name="firstName"
                             placeholder="First name" />
                         </Form.Group>
 
-                        <Form.Group as={Col} controlId="userLastName">
+                        <Form.Group as={Col} controlId="formLastName">
                             {/* <Form.Label>Last Name</Form.Label> */}
                             <Form.Control 
                             required 
                             type="text" 
-                            name="userName"
+                            name="lastName"
                             placeholder="Last name" />
                         </Form.Group>
                         {/* </Form.Row> */}
 
                         {/* <Form.Row> */}
-                        <Form.Group as={Col} controlId="userEmail">
+                        <Form.Group as={Col} controlId="formEmail">
                             {/* <Form.Label>Last Name</Form.Label> */}
                             <Form.Control 
                             required 
                             type="text" 
-                            name="userEmail"
+                            name="email"
                             placeholder="Email" />
                         </Form.Group>
                         </Form.Row>
@@ -213,7 +313,15 @@ class Users extends Component {
                 </div>
                 </Col>
             </Row>
-            
+
+            {/* Error message */}
+            <Row>
+                <div>
+                    { this.state.errorMessage &&
+                        <p className="error"> { this.state.errorMessage } </p> 
+                    }
+                </div>
+            </Row>
 
             </Container>
 
