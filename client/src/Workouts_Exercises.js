@@ -160,7 +160,9 @@ class Exercises extends Component {
                             <br />
                             <br />
                             If you delete an Exercise from a workout, the remaining exercises will
-                            move adjust order so order is maintained without gaps.
+                            move adjust order so order is maintained without gaps. You cannot delete 
+                            the last exercise from a Workout as each Workout must have at least 1 
+                            exercise. To delete the Workout, go to the Workouts page.
                         </p>
                     </div>
                 </Row>
@@ -275,8 +277,8 @@ class Exercises extends Component {
                                     <td key = {id}>{workout_name}</td>
                                     <td >{user_name}</td>
                                     <td>{exercise_name}</td>
-                                    <td>{sets}</td>
                                     <td>{reps}</td>
+                                    <td>{sets}</td>
                                     <td>{exercise_order}</td>
                                     <td>
                                         <Button onClick={(e) => { this.deleteHandle(e, workout_exercise_id, id, exercise_order)}}

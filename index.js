@@ -146,6 +146,7 @@ Queries
 workoutUsers = 
 "select " +
   "ww.id, " +
+  "uu.id as user_id, " + 
   "ww.name as workout_name, " +
   "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
   "COUNT(distinct we.id) as total_exercises " +
@@ -154,7 +155,7 @@ workoutUsers =
   "left join workouts_exercises we on we.workout_id = ww.id " +
   "left join users uu on uu.id = ww.user_id " +
 
-  "group by 1,2,3 " +
+  "group by 1,2,3,4 " +
   
   "order by ww.id" +
   ";";
@@ -165,6 +166,7 @@ workoutUsers =
     "ww.id, " +
     "we.id as workout_exercise_id, " +
     "ww.name as workout_name, " +
+    "uu.id as user_id, " +
     "CONCAT(uu.first_name, ' ', uu.last_name) as user_name, " +
     "ee.name as exercise_name, " +
     "we.sets, " +
@@ -241,7 +243,6 @@ app.get('/getUsers', async function(req,res,next){
 
     //execute the query and the send the results back to the client
     executeQuery(query, function(context){
-        // console.log("context", context);
         res.send(context);
     });
 });
@@ -257,7 +258,6 @@ app.get('/getWorkouts', async function(req,res,next){
 
     //execute the query and the send the results back to the client
     executeQuery(workoutSummary, function(context){
-        // console.log("context", context);
         res.send(context);
     });
 });
@@ -295,6 +295,41 @@ app.post('/insertWorkout', function(req,res,error){
         parameterQuery(query2)})
         //then get updated data to return back as the post response
         .then(() => successCallback(workoutUsers, res)).catch(errorCallback);
+});
+
+/*********************************************************
+/updateWorkout handle:  
+Inserts a workout into the database
+Receives: nothing
+Returns: all rows from that table
+*********************************************************/
+app.post('/updateWorkout', function(req,res,error){
+
+    let queryText = "UPDATE Workouts SET name = ?, user_id = ? " +
+    "WHERE id = ?;";
+
+    let nullQueryText = "UPDATE Workouts SET name = ?, user_id = NULL " +
+    "WHERE id = ?;";
+
+    let query1 = {};
+
+    if (req.body.user_id === "null"){
+        query1 = {
+            text : nullQueryText,
+            placeholder_arr : [req.body.workoutName, req.body.workoutId],
+        };
+    }
+    else {
+        query1 = {
+            text : queryText,
+            placeholder_arr : [req.body.workoutName, req.body.user_id, req.body.workoutId],
+        };
+    }  
+
+    //Insert new workout into Workouts
+    parameterQuery(query1)
+    //then get updated data to return back as the post response
+    .then(() => successCallback(workoutUsers, res)).catch(errorCallback);
 });
 
 /*********************************************************
