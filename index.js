@@ -36,6 +36,17 @@ function parameterQuery(query) {
     })
 };
 
+function parameterQuery2(query, callback) {
+    mysql.pool.query(query.text, query.placeholder_arr, function(err, rows) {
+        if(err){
+            console.log('error');
+            next(err);
+        }
+        // console.log("row: ", rows);
+        callback(rows);
+    });
+}
+
 /*********************************************************
 executeQuery: 
 Executes the query and returns all the rows
@@ -96,6 +107,12 @@ function successCallback(query, res){
     });
   }
 
+function successCallback2(query, res){
+    //execute the query and the send the results back to the client
+    parameterQuery2(query, function(context){
+        res.send(context);
+    });
+}
 /*********************************************************
 errorCallback: 
 Executes when we have an error with our query
@@ -718,28 +735,46 @@ Returns: all rows from that table
 app.post('/searchUser', function(req,res,error){
 
 
+    // let checkQuery = "SELECT id FROM Users " +
+    // "WHERE lower(first_name) = lower(?) " +
+    // "OR lower(last_name) = lower(?) " +
+    // "OR lower(email) = lower(?);";
+
     let checkQuery = "SELECT id FROM Users " +
-    "WHERE lower(first_name) = lower(?) " +
-    "OR lower(last_name) = lower(?) " +
-    "OR lower(email) = lower(?);";
+    "WHERE lower(first_name) LIKE lower(?) " +
+    "OR lower(last_name) LIKE lower(?) " +
+    "OR lower(email) LIKE lower(?);";
+
+    // let check1 = {
+    //     text: checkQuery,
+    //     placeholder_arr: [req.body.searchParameter, req.body.searchParameter, req.body.searchParameter] 
+    // };
 
     let check1 = {
         text: checkQuery,
-        placeholder_arr: [req.body.searchParameter, req.body.searchParameter, req.body.searchParameter] 
+        placeholder_arr: ['%' + req.body.searchParameter + '%', '%' + req.body.searchParameter + '%', '%' + req.body.searchParameter + '%'] 
     };
 
     let successQuery = "SELECT * FROM Users WHERE first_name = 'kelley';";
 
-    let queryText = "INSERT INTO Users (first_name, last_name, email, created_at) " +
-    "VALUES (?, " + // firstName
-    "?, " + // lastName
-    "?, " + // email
-    "now()" + // created_at
-    ");";
+    // let queryText = "SELECT * FROM Users " +
+    // "WHERE lower(first_name) = lower(?) " +
+    // "OR lower(last_name) = lower(?) " +
+    // "OR lower(email) = lower(?);";
 
+    let queryText = "SELECT * FROM Users " +
+    "WHERE lower(first_name) LIKE lower(?) " +
+    "OR lower(last_name) LIKE lower(?) " +
+    "OR lower(email) LIKE lower(?);";
+    
+    // let query1 = {
+    //     text : queryText,
+    //     placeholder_arr: [req.body.searchParameter, req.body.searchParameter, req.body.searchParameter] 
+    // };
+   
     let query1 = {
         text : queryText,
-        placeholder_arr: [req.body.firstName, req.body.lastName, req.body.email], 
+        placeholder_arr: ['%' + req.body.searchParameter + '%', '%' + req.body.searchParameter + '%', '%' + req.body.searchParameter + '%'] 
     };
     
     //check if we already have name in database, if so don't add again
@@ -749,7 +784,8 @@ app.post('/searchUser', function(req,res,error){
         if (response.length != 0){
             //insert into Muscle_Groups
             parameterQuery(check1)
-            .then(() => successCallback(successQuery, res)).catch(errorCallback);
+            // .then(() => successCallback(successQuery, res)).catch(errorCallback);
+            .then(() => successCallback2(query1, res)).catch(errorCallback);
         }
         //otherwise don't insert the data and return back a failure
         else {
