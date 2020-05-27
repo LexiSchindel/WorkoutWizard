@@ -105,8 +105,13 @@ class Exercises extends Component {
             <br />
                 <Row>
                     <div>
-                        <p>A variety of exercises you can add to your workouts.
+                        <p>
                             Please add new exercises to further develop our library.
+                            <br />
+                            <br />
+                            We would like you to also add a muscle group associated with that exercise.
+                            You can select 1 association here but add additional muscle groups on the
+                            Muscle Groups page. 
                         </p>
                     </div>
                 </Row>
@@ -168,7 +173,6 @@ class Exercises extends Component {
             <Table striped bordered hover size="sm" responsive>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Exercise</th>
                     </tr>
                 </thead>
@@ -183,7 +187,6 @@ class Exercises extends Component {
                     return (
                         
                                 <tr key={id}>
-                                    <td>{id}</td>
                                     <td>{name}</td>
                                 </tr>
     
