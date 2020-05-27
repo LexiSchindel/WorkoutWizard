@@ -36,7 +36,15 @@ function parameterQuery(query) {
     })
 };
 
-function parameterQuery2(query, callback) {
+/*********************************************************
+executeParameterQuery:  
+Executes the query and returns all the rows
+from the results back to the callback which well send to 
+the client
+Receives: JSON object with text + placeholder_arr values, callback
+Returns: nothing (sends back rows to callback function)
+*********************************************************/
+function executeParameterQuery(query, callback) {
     mysql.pool.query(query.text, query.placeholder_arr, function(err, rows) {
         if(err){
             console.log('error');
@@ -107,12 +115,20 @@ function successCallback(query, res){
     });
   }
 
-function successCallback2(query, res){
+/*********************************************************
+successCallbackParameter: 
+Executes when we have a successful insert/delete
+Receives: query text to execute (with parameters parameters) and the res
+so we can send back context using res.send
+Returns: Nothing
+*********************************************************/
+function successCallbackParameter(query, res){
     //execute the query and the send the results back to the client
-    parameterQuery2(query, function(context){
+    executeParameterQuery(query, function(context){
         res.send(context);
     });
 }
+
 /*********************************************************
 errorCallback: 
 Executes when we have an error with our query
@@ -724,70 +740,67 @@ app.post('/insertExercisesMuscleGroups', function(req,res,error){
 });
 
 
-
-
 /*********************************************************
 /searchUser handle:  
-Inserts a user into the database
+Searches database for similar users with LIKE query
 Receives: nothing
-Returns: all rows from that table
+Returns: all rows LIKE search parameter if similar exists.
 *********************************************************/
 app.post('/searchUser', function(req,res,error){
 
 
-    // let checkQuery = "SELECT id FROM Users " +
+    // let checkQueryText = "SELECT id FROM Users " +
     // "WHERE lower(first_name) = lower(?) " +
     // "OR lower(last_name) = lower(?) " +
     // "OR lower(email) = lower(?);";
-
-    let checkQuery = "SELECT id FROM Users " +
-    "WHERE lower(first_name) LIKE lower(?) " +
-    "OR lower(last_name) LIKE lower(?) " +
-    "OR lower(email) LIKE lower(?);";
-
-    // let check1 = {
+ 
+    // let checkQuery = {
     //     text: checkQuery,
     //     placeholder_arr: [req.body.searchParameter, req.body.searchParameter, req.body.searchParameter] 
     // };
 
-    let check1 = {
-        text: checkQuery,
+    let checkQueryText = "SELECT id FROM Users " +
+    "WHERE lower(first_name) LIKE lower(?) " +
+    "OR lower(last_name) LIKE lower(?) " +
+    "OR lower(email) LIKE lower(?);";
+
+    let checkQuery = {
+        text: checkQueryText,
         placeholder_arr: ['%' + req.body.searchParameter + '%', '%' + req.body.searchParameter + '%', '%' + req.body.searchParameter + '%'] 
     };
-
-    let successQuery = "SELECT * FROM Users WHERE first_name = 'kelley';";
 
     // let queryText = "SELECT * FROM Users " +
     // "WHERE lower(first_name) = lower(?) " +
     // "OR lower(last_name) = lower(?) " +
     // "OR lower(email) = lower(?);";
 
-    let queryText = "SELECT * FROM Users " +
-    "WHERE lower(first_name) LIKE lower(?) " +
-    "OR lower(last_name) LIKE lower(?) " +
-    "OR lower(email) LIKE lower(?);";
-    
     // let query1 = {
     //     text : queryText,
     //     placeholder_arr: [req.body.searchParameter, req.body.searchParameter, req.body.searchParameter] 
     // };
-   
-    let query1 = {
-        text : queryText,
+
+    let returnQueryText = "SELECT * FROM Users " +
+    "WHERE lower(first_name) LIKE lower(?) " +
+    "OR lower(last_name) LIKE lower(?) " +
+    "OR lower(email) LIKE lower(?);";
+    
+    let returnQuery = {
+        text : returnQueryText,
         placeholder_arr: ['%' + req.body.searchParameter + '%', '%' + req.body.searchParameter + '%', '%' + req.body.searchParameter + '%'] 
     };
     
-    //check if we already have name in database, if so don't add again
-    parameterQuery(check1)
+    //check if we have something similar in the database, if we do, proceed
+    parameterQuery(checkQuery)
     .then((response) => {
-        //if we do not have the data, then response.length == 0 so insert
+        //if we have data, response != 0
         if (response.length != 0){
-            //insert into Muscle_Groups
-            parameterQuery(check1)
-            // .then(() => successCallback(successQuery, res)).catch(errorCallback);
-            .then(() => successCallback2(query1, res)).catch(errorCallback);
+            // // catch? 
+            // parameterQuery(checkQuery)
+            // .then(() => successCallbackParameter(returnQuery, res)).catch(errorCallback);
+            
+            successCallbackParameter(returnQuery, res);
         }
-        //otherwise don't insert the data and return back a failure
+        //otherwise return back a failure
         else {
             res.send(JSON.stringify(
                 {
