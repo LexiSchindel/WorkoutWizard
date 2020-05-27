@@ -56,11 +56,11 @@ class Users extends Component {
         if (newData.failure === undefined){
             this.setState({
                 data: newData,
-                errorMessage: '',
+                errorMessage2: '',
             });
         }
         else {
-            this.setState({errorMessage: "User does not exist"});
+            this.setState({errorMessage2: "User does not exist"});
         }
     })
     .catch((error) => {
@@ -217,6 +217,15 @@ class Users extends Component {
                     </Form>
                 </div>
                 </Col>
+            </Row>
+
+            {/* Error message */}
+            <Row>
+                <div>
+                    { this.state.errorMessage2 &&
+                        <p className="error2"> { this.state.errorMessage2 } </p> 
+                    }
+                </div>
             </Row>
             <br />
             <br />
