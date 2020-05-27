@@ -6,6 +6,7 @@ import Button from 'react-bootstrap/Button';
 import style from './style';
 import { deleteData } from './deleteData';
 import { submitData } from './submitData';
+import UpdateModal from './UpdateModal';
  
 class Workouts extends Component {
 
@@ -16,13 +17,18 @@ class Workouts extends Component {
         data: [],
         users: [],
         exercises: [],
-        error: null
+        error: null,
+        showModal: false,
+        modalData: {isOpen: false,},
       };
       // this.handleSubmit = this.submitData.bind(this);
 
       //need to bind "this" to our on click handles so it is able to update the state
       this.submitHandle = this.submitHandle.bind(this);
       this.deleteHandle = this.deleteHandle.bind(this);
+      this.updateHandle = this.updateHandle.bind(this);
+      this.updateSend = this.updateSend.bind(this);
+      this.parentClose = this.parentClose.bind(this);
     };
 
     /************************************************
@@ -86,6 +92,51 @@ class Workouts extends Component {
       event.target.elements.repCount.value = "";
       event.target.elements.setCount.value = "";
     };
+
+    /************************************************
+     * updateHandle:
+     * gets data from the form fields, then submits
+     * using fetch. Will update the state to rerender
+     * the page with the updated data. 
+     * 
+     * Post request should return new "data" to update
+     * state with
+    ************************************************/
+    updateHandle(id, user_id, workout_name, user_name) {
+      this.setState({
+        modalData: {id, user_id, workout_name, user_name, isOpen: true, modalTitle: "Update Workout"},
+      })
+      
+    };
+
+    parentClose() {
+      this.setState({
+        modalData: {isOpen: false,}
+      });
+    }
+
+    /************************************************
+     * updateSend:
+     * Called from the child component UpdateModal. 
+     * Updates info associated with the Workout/User
+     * and returns updated data to repopulate table. 
+     * 
+     * Post request should return new "data" to update
+     * state with
+    ************************************************/
+    updateSend(data) {
+      submitData(data, '/updateWorkout')
+      .then(newData => {
+        this.setState({data: newData});
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+
+      this.setState({
+        modalData: {isOpen: false},
+      })
+    }
 
     componentDidMount() {
         // Simple GET request using fetch
@@ -244,7 +295,7 @@ class Workouts extends Component {
                 {!isLoading ? (
                     
                     data.map((data, i) => {
-                      const { id, workout_name, user_name, total_exercises } = data;
+                      const { id, workout_name, user_name, total_exercises, user_id } = data;
                       return (
                           
                                   <tr key={i}>
@@ -261,7 +312,8 @@ class Workouts extends Component {
                                           </Button>
                                     </td>
                                     <td>
-                                          <Button 
+                                          <Button  
+                                          onClick={() => { this.updateHandle(id, user_id, workout_name, user_name)}}
                                           variant="outline-info" 
                                           type="update">
                                               Update Workout
@@ -278,6 +330,15 @@ class Workouts extends Component {
                 </tbody>
             </Table>
             </Row>
+
+            <Row>
+            <div> 
+                <UpdateModal contents={this.state.modalData} updateSend={this.updateSend} parentClose={this.parentClose}>
+                
+                </UpdateModal>
+            </div> 
+            </Row>
+
             </Container>
         </div>
         );

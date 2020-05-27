@@ -277,8 +277,8 @@ class Exercises extends Component {
                                     <td key = {id}>{workout_name}</td>
                                     <td >{user_name}</td>
                                     <td>{exercise_name}</td>
-                                    <td>{sets}</td>
                                     <td>{reps}</td>
+                                    <td>{sets}</td>
                                     <td>{exercise_order}</td>
                                     <td>
                                         <Button onClick={(e) => { this.deleteHandle(e, workout_exercise_id, id, exercise_order)}}
