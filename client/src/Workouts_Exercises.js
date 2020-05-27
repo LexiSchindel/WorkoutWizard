@@ -149,14 +149,14 @@ class Exercises extends Component {
             <br />
                 <Row>
                     <div>
-                        <p>A variety of exercises you can add to your workouts. 
+                        <p>
                             You can insert an exercise at the beginning, end or middle of 
                             the workout selected by choosing the appropriate Exercise Order.
                             <br />
                             <br />
                             If you choose an Exercise Order number greater than the total
                             exercises currently included in the workout, the new exercise 
-                            will be inserted at the end of the Workout.
+                            will be inserted at the end of the Workout (with no gaps).
                             <br />
                             <br />
                             If you delete an Exercise from a workout, the remaining exercises will
@@ -251,7 +251,6 @@ class Exercises extends Component {
             <Table striped bordered hover size="sm" responsive>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Workout Name</th>
                         <th>Workout Author</th>
                         <th>Exercise</th>
@@ -273,7 +272,6 @@ class Exercises extends Component {
                     return (
                         
                                 <tr key={i}>
-                                    <td >{id}</td>
                                     <td key = {id}>{workout_name}</td>
                                     <td >{user_name}</td>
                                     <td>{exercise_name}</td>

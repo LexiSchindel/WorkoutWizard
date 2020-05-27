@@ -63,7 +63,6 @@ class Home extends Component {
             <Table striped bordered hover size="sm" responsive>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Workout Name</th>
                         <th>Workout Author</th>
                         <th>Exercise</th>
@@ -89,7 +88,6 @@ class Home extends Component {
                     return (
 
                                 <tr rowSpan={total_exercises} key={i} id={id}>
-                                  <td >{id}</td>
                                   <td >{workout_name}</td>
                                   <td >{user_name}</td>
                                   <td>{exercise_name}</td>
@@ -103,7 +101,7 @@ class Home extends Component {
                   else {
                     return (
                       <tr key={i} id={id}>
-                      <td colSpan="3"></td>
+                      <td colSpan="2"></td>
                       <td>{exercise_name}</td>
                       <td>{sets}</td>
                       <td>{reps}</td>

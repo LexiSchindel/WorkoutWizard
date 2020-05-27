@@ -73,7 +73,6 @@ class UpdateModal extends Component {
     static getDerivedStateFromProps(nextProps, prevState) {
         // Check to see if the requestRefresh prop has changed
         if (nextProps.contents.isOpen === true) {
-            console.log(nextProps);
             if (nextProps.contents.user_id === null)
             {    return {
                 user: nextProps.contents.user_name,

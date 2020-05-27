@@ -279,7 +279,6 @@ class Workouts extends Component {
             <Table striped bordered hover size="sm" responsive>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Workout Name</th>
                         <th>Workout Author</th>
                         <th># of Exercises</th>
@@ -299,7 +298,6 @@ class Workouts extends Component {
                       return (
                           
                                   <tr key={i}>
-                                      <td >{id}</td>
                                       <td key = {id}>{workout_name}</td>
                                       <td >{user_name}</td>
                                       <td>{total_exercises}</td>
