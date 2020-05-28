@@ -235,7 +235,6 @@ class Users extends Component {
             <Table striped bordered hover size="sm" responsive>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>Email</th>
@@ -252,7 +251,6 @@ class Users extends Component {
                     return (
                         
                                 <tr key={id}>
-                                    <td>{id}</td>
                                     <td>{first_name}</td>
                                     <td>{last_name}</td>
                                     <td>{email}</td>

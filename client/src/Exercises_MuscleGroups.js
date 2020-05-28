@@ -209,10 +209,8 @@ class Exercises_MuscleGroups extends Component {
             <Table striped bordered hover size="sm" responsive>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Exercise</th>
                         <th>Muscle Group</th>
-
                     </tr>
                 </thead>
                 <tbody>
@@ -227,7 +225,6 @@ class Exercises_MuscleGroups extends Component {
                     return (
                         
                                 <tr key={id}>
-                                    <td>{id}</td>
                                     <td>{exercise_name}</td>
                                     <td>{musclegrp_name}</td>
                                 </tr>

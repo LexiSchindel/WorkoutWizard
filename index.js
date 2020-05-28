@@ -201,7 +201,7 @@ workoutUsers =
     "FROM exercises_musclegroups emg " +
     "JOIN exercises ee on ee.id = emg.exercise_id " +
     "JOIN muscle_groups mg on mg.id = emg.musclegrp_id " +
-    "ORDER BY emg.id ASC" +
+    "ORDER BY ee.name ASC" +
     ";";
 
 /*********************************************************
