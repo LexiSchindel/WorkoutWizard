@@ -23,6 +23,8 @@ class Users extends Component {
         
         
         this.searchData = this.searchData.bind(this);
+
+        this.getAllData = this.getAllData.bind(this);
     }
 
 
@@ -41,7 +43,6 @@ class Users extends Component {
 
         searchParameter: event.target.elements.formSearchParameter.value
     };
-    console.log("search click");
 
     fetch('/searchUser', {
         method: 'POST',
@@ -116,25 +117,24 @@ class Users extends Component {
             event.target.elements.formEmail.value = '';
     }
 
-
-
-
+    getAllData(){
+    fetch('/getTable?table=Users')
+    .then((response) => {
+        return response.json();
+      })
+      .then(data =>
+        this.setState({
+          data: data,
+          isLoading: false,
+        })
+      )
+    // Catch any errors we hit and update the app
+    .catch(error => this.setState({ error, isLoading: false }));
+    }
 
     
     componentDidMount() {
-        // Simple GET request using fetch
-        fetch('/getTable?table=Users')
-        .then((response) => {
-            return response.json();
-          })
-          .then(data =>
-            this.setState({
-              data: data,
-              isLoading: false,
-            })
-          )
-        // Catch any errors we hit and update the app
-        .catch(error => this.setState({ error, isLoading: false }));
+        this.getAllData();
     }
 
     render() {
@@ -160,7 +160,8 @@ class Users extends Component {
             <Row>
                 <Col>
                 <div style={style.inputForm}>
-                    <Form onSubmit={this.searchData}>
+                    <Form onSubmit={this.searchData}
+                        onReset={this.getAllData}>
                         <Form.Label>Search User</Form.Label>
 
                         <Form.Row>
@@ -213,6 +214,11 @@ class Users extends Component {
                         variant="primary" 
                         type="submit">
                             Search
+                        </Button>
+                        <Button 
+                        variant="secondary" 
+                        type="reset">
+                            Reset Table
                         </Button>
                     </Form>
                 </div>
