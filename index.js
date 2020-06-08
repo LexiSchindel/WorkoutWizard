@@ -305,10 +305,10 @@ Returns: all rows from that table
 *********************************************************/
 app.post('/updateWorkout', function(req,res,error){
 
-    let queryText = "UPDATE Workouts SET name = ?, user_id = ? " +
+    let queryText = "UPDATE Workouts SET name = ?, user_id = ?, updated_at = Now() " +
     "WHERE id = ?;";
 
-    let nullQueryText = "UPDATE Workouts SET name = ?, user_id = NULL " +
+    let nullQueryText = "UPDATE Workouts SET name = ?, user_id = NULL, updated_at = Now() " +
     "WHERE id = ?;";
 
     let query1 = {};
