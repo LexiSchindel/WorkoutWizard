@@ -220,7 +220,7 @@ class Workouts extends Component {
 
                   <Form.Group as={Col} controlId="User">
                     <Form.Label>Workout Author</Form.Label>
-                    <Form.Control required as="select" placeholder="Select User...">
+                    <Form.Control as="select" placeholder="Select User...">
                       <option></option>
 
                       {/* Loops through user names to populate form dropdown */}
@@ -254,12 +254,12 @@ class Workouts extends Component {
 
                   <Form.Group as={Col} controlId="repCount">
                     <Form.Label>Reps</Form.Label>
-                    <Form.Control required type="number"/>
+                    <Form.Control required type="number" min="1" />
                   </Form.Group>
 
                   <Form.Group as={Col} controlId="setCount">
                     <Form.Label>Sets</Form.Label>
-                    <Form.Control required type="number"/>
+                    <Form.Control required type="number" min="1" />
                   </Form.Group>
                   </Form.Row>
 

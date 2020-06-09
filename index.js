@@ -270,8 +270,13 @@ Returns: all rows from that table
 *********************************************************/
 app.post('/insertWorkout', function(req,res,error){
 
+    var query1 = {};
+
     let queryText = "INSERT INTO Workouts (name, created_at, updated_at, user_id) " +
     "VALUES (?, now(), now(), ?);";
+
+    let queryNullUserText = "INSERT INTO Workouts (name, created_at, updated_at, user_id) " +
+    "VALUES (?, now(), now(), NULL);";
 
     let queryText2 = "INSERT INTO Workouts_Exercises (workout_id, exercise_id, sets, reps, exercise_order) " +
         "VALUES (?, " + //workoutId from the insert id returned by insert query
@@ -279,10 +284,18 @@ app.post('/insertWorkout', function(req,res,error){
         "?, ?, 1 " + //sets, reps, exerciseOrder
         ");";
 
-    var query1 = {
-        text : queryText,
-        placeholder_arr : [req.body.workoutName, req.body.User],
-    };
+    if (req.body.User === ""){
+        query1 = {
+            text : queryNullUserText,
+            placeholder_arr : [req.body.workoutName],
+        };
+    }
+    else {
+        query1 = {
+            text : queryText,
+            placeholder_arr : [req.body.workoutName, req.body.User],
+        };
+    }
 
     //Insert new workout into Workouts
     parameterQuery(query1)
@@ -292,9 +305,10 @@ app.post('/insertWorkout', function(req,res,error){
             text : queryText2,
             placeholder_arr : [row.insertId, req.body.exerciseId, req.body.setCount, req.body.repCount],
         };
-        parameterQuery(query2)})
+        return parameterQuery(query2)})
         //then get updated data to return back as the post response
-        .then(() => successCallback(workoutUsers, res)).catch(errorCallback);
+    .then(() => successCallback(workoutUsers, res))
+    .catch(errorCallback);
 });
 
 /*********************************************************
@@ -305,10 +319,10 @@ Returns: all rows from that table
 *********************************************************/
 app.post('/updateWorkout', function(req,res,error){
 
-    let queryText = "UPDATE Workouts SET name = ?, user_id = ? " +
+    let queryText = "UPDATE Workouts SET name = ?, user_id = ?, updated_at = Now() " +
     "WHERE id = ?;";
 
-    let nullQueryText = "UPDATE Workouts SET name = ?, user_id = NULL " +
+    let nullQueryText = "UPDATE Workouts SET name = ?, user_id = NULL, updated_at = Now() " +
     "WHERE id = ?;";
 
     let query1 = {};
@@ -426,7 +440,7 @@ app.post('/insertWorkoutExercise', function(req,res,error){
                     placeholder_arr: [req.body.workoutId, req.body.exerciseId, 
                         req.body.repCount, req.body.setCount, req.body.exerciseOrder],
                 };
-                parameterQuery(insertQuery)
+                return parameterQuery(insertQuery)
                 //finally get refreshed data and send it back as the post response  
                 .then(() => {
                     successCallback(workoutSummary, res)})
@@ -575,8 +589,8 @@ app.post('/insertExercise', function(req,res,error){
                     text : queryText2,
                     placeholder_arr : [row.insertId, req.body.muscleGrpId],
                 };
-                parameterQuery(query2)})
-                .then(() => successCallback(successQuery, res)).catch(errorCallback);
+                return parameterQuery(query2)})
+            .then(() => successCallback(successQuery, res)).catch(errorCallback);
         }
         //otherwise don't insert the data and return back a failure
         else {

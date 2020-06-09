@@ -80,20 +80,29 @@ class Exercises extends Component {
         exerciseOrder: event.target.elements.exerciseOrder.value
     };
     
-    submitData(data, '/insertWorkoutExercise')
-    .then(newData => {
-      this.setState({data: newData});
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
-
-    //reset form values
-    event.target.elements.formExercise.value = '';
-    event.target.elements.formWorkout.value = '';
-    event.target.elements.repCount.value = '';
-    event.target.elements.setCount.value = '';
-    event.target.elements.exerciseOrder.value = '';
+    if (event.target.elements.repCount.value <= 0
+        || event.target.elements.setCount.value <= 0
+        || event.target.elements.exerciseOrder.value <= 0)
+    {
+        this.setState({errorMessage: "Sets, Reps and Exercise Order must be positive integer values!"});
+    }
+    else {
+        submitData(data, '/insertWorkoutExercise')
+        .then(newData => {
+            this.setState({data: newData});
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+      
+          //reset form values
+          event.target.elements.formExercise.value = '';
+          event.target.elements.formWorkout.value = '';
+          event.target.elements.repCount.value = '';
+          event.target.elements.setCount.value = '';
+          event.target.elements.exerciseOrder.value = '';
+        this.setState({errorMessage: ''});
+    }
   };
 
     componentDidMount() {
@@ -211,19 +220,19 @@ class Exercises extends Component {
 
                         <Form.Row>
 
-                            <Form.Group as={Col} controlId="repCount">
+                            <Form.Group as={Col} controlId="repCount" required>
                                 <Form.Label>Reps</Form.Label>
-                                <Form.Control />
+                                <Form.Control type="number" min="1" />
                             </Form.Group>
 
-                            <Form.Group as={Col} controlId="setCount">
+                            <Form.Group as={Col} controlId="setCount" required>
                                 <Form.Label>Sets</Form.Label>
-                                <Form.Control />
+                                <Form.Control type="number" min="1" />
                             </Form.Group>
 
-                            <Form.Group as={Col} controlId="exerciseOrder">
+                            <Form.Group as={Col} controlId="exerciseOrder" required>
                                 <Form.Label>Exercise Order</Form.Label>
-                                <Form.Control />
+                                <Form.Control type="number" min="1"/>
                             </Form.Group>
                             </Form.Row>
                         
