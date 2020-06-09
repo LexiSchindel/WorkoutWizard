@@ -254,12 +254,12 @@ class Workouts extends Component {
 
                   <Form.Group as={Col} controlId="repCount">
                     <Form.Label>Reps</Form.Label>
-                    <Form.Control required type="number"/>
+                    <Form.Control required type="number" min="1" />
                   </Form.Group>
 
                   <Form.Group as={Col} controlId="setCount">
                     <Form.Label>Sets</Form.Label>
-                    <Form.Control required type="number"/>
+                    <Form.Control required type="number" min="1" />
                   </Form.Group>
                   </Form.Row>
 

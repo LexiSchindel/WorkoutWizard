@@ -222,17 +222,17 @@ class Exercises extends Component {
 
                             <Form.Group as={Col} controlId="repCount" required>
                                 <Form.Label>Reps</Form.Label>
-                                <Form.Control />
+                                <Form.Control type="number" min="1" />
                             </Form.Group>
 
                             <Form.Group as={Col} controlId="setCount" required>
                                 <Form.Label>Sets</Form.Label>
-                                <Form.Control />
+                                <Form.Control type="number" min="1" />
                             </Form.Group>
 
                             <Form.Group as={Col} controlId="exerciseOrder" required>
                                 <Form.Label>Exercise Order</Form.Label>
-                                <Form.Control />
+                                <Form.Control type="number" min="1"/>
                             </Form.Group>
                             </Form.Row>
                         

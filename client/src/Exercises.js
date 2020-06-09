@@ -134,7 +134,10 @@ class Exercises extends Component {
                         
                         <Form.Group as={Col} controlId="formMuscleGroup">
                             {/* <Form.Label>Workout Author</Form.Label> */}
-                            <Form.Control as="select" placeholder="Search..." required>
+                            <Form.Control 
+                            as="select" 
+                            placeholder="Search..." 
+                            required>
                                 <option></option>
 
                                 {/* Loops through user names to populate form dropdown */}
