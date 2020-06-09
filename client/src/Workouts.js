@@ -220,7 +220,7 @@ class Workouts extends Component {
 
                   <Form.Group as={Col} controlId="User">
                     <Form.Label>Workout Author</Form.Label>
-                    <Form.Control required as="select" placeholder="Select User...">
+                    <Form.Control as="select" placeholder="Select User...">
                       <option></option>
 
                       {/* Loops through user names to populate form dropdown */}
